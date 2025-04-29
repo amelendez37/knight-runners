@@ -1,0 +1,15 @@
+{
+  "name": "knight-runners",
+  "version": "1.0.0",
+  "description": "2D side scroller browser game",
+  "main": "index.js",
+  "repository": "https://github.com/amelendez37/knight-runners.git",
+  "author": "Aaron Melendez <aaron.melendez37@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
