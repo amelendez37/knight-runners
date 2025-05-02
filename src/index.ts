@@ -20,7 +20,7 @@ function run() {
     const gameState = new GameState();
     canvas.width = gameState.getScreenWidth();
     canvas.height = gameState.getScreenHeight();
-    const player = new Player(0, 0, ctx);
+    const player = new Player(0, 890, ctx, gameState);
     gameState.addGameObject(player);
 
     gameLoop(gameState, ctx);
