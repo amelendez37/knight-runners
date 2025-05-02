@@ -2,6 +2,11 @@ import { GameState } from "./gameState";
 
 export type GameObjectType = BaseObject | Player;
 
+interface Hitbox {
+    width: number;
+    height: number;
+}
+
 export class BaseObject {
     x: number;
     y: number;
@@ -10,6 +15,7 @@ export class BaseObject {
     speed: number;
     gravity: number;
     model: HTMLImageElement;
+    #hitbox = {} as Hitbox;
     ctx: CanvasRenderingContext2D;
     #gameState: GameState;
 
@@ -26,14 +32,14 @@ export class BaseObject {
     }
 
     checkCollisionLeft() {
-        if (this.x <= 0) {
+        if (this.x - this.getHitbox().width <= 0) {
             return true;
         }
         return false;
     }
 
     checkCollisionRight() {
-        if (this.x >= this.#gameState.getScreenWidth()) {
+        if (this.x + this.getHitbox().width >= this.#gameState.getScreenWidth()) {
             return true;
         }
         return false;
@@ -41,10 +47,18 @@ export class BaseObject {
 
     checkCollisionBottom() {
         // todo: will remove this condition since the game will not have a floor in the future
-        if (this.y >= this.#gameState.getScreenHeight()) {
+        if (this.y + this.getHitbox().height >= this.#gameState.getScreenHeight()) {
             return true;
         }
         return false;
+    }
+
+    setHitbox(hitbox: Hitbox) {
+        this.#hitbox = hitbox;
+    }
+
+    getHitbox() {
+        return this.#hitbox;
     }
 
     update() {
@@ -57,7 +71,7 @@ export class BaseObject {
 
         // update vertical movement
         if (!this.checkCollisionBottom()) {
-            this.y -= this.gravity;
+            this.y += this.gravity;
         }
     }
 
@@ -70,10 +84,14 @@ export class Player extends BaseObject {
     constructor(x: number, y: number, ctx: CanvasRenderingContext2D, gameState: GameState) {
         super(x, y, ctx, gameState);
         this.model.src = './assets/min-knight-128.png';
-        this.setupMovement();
+        this.setHitbox({
+            width: 60,
+            height: 121,
+        });
+        this.setupMovementControls();
     }
 
-    setupMovement() {
+    setupMovementControls() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'd') {
                 this.movingRight = true;
