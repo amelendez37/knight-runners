@@ -1,27 +1,29 @@
+import { GameState } from './classes/gameState';
 import { Player } from './classes/gameObjects';
-import { checkIsInBounds } from "./utils";
 
-const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
-// gives us methods to draw within our 2d canvas element
-const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, gameState.getScreenWidth(), gameState.getScreenHeight());
 
-const CANVAS_WIDTH = canvas.width = window.innerWidth;
-const CANVAS_HEIGHT = canvas.height = window.innerHeight;
-
-function gameLoop(gameObjects: any[]) {
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    for (const object of gameObjects) {
+    for (const object of gameState.getGameObjects()) {
         object.update();
         object.draw();
     }
 
-    requestAnimationFrame(() => gameLoop(gameObjects));
+    requestAnimationFrame(() => gameLoop(gameState, ctx));
 }
 
 function run() {
+    const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+    // gives us methods to draw within our 2d canvas element
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    const gameState = new GameState();
+    canvas.width = gameState.getScreenWidth();
+    canvas.height = gameState.getScreenHeight();
     const player = new Player(0, 0, ctx);
-    gameLoop([player]);
+    gameState.addGameObject(player);
+
+    gameLoop(gameState, ctx);
 }
 
 run();

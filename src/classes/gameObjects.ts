@@ -6,7 +6,7 @@ export class BaseObject {
     movingRight: boolean;
     movingLeft: boolean;
     speed: number;
-    character: HTMLImageElement;
+    model: HTMLImageElement;
     ctx: CanvasRenderingContext2D;
 
     constructor(x: number, y: number, ctx: CanvasRenderingContext2D) {
@@ -15,7 +15,7 @@ export class BaseObject {
         this.movingRight = false;
         this.movingLeft = false;
         this.speed = 4;
-        this.character = Object.assign(new Image(), { src: './assets/min-knight-128.png' });
+        this.model = new Image();
         this.ctx = ctx;
     }
 
@@ -33,13 +33,14 @@ export class BaseObject {
     }
 
     draw() {
-        this.ctx.drawImage(this.character, this.x, this.y);
+        this.ctx.drawImage(this.model, this.x, this.y);
     }
 }
 
 export class Player extends BaseObject {
     constructor(x: number, y: number, ctx: CanvasRenderingContext2D) {
         super(x, y, ctx);
+        this.model.src = './assets/min-knight-128.png';
         this.setupMovement();
     }
 
@@ -65,5 +66,9 @@ export class Player extends BaseObject {
 }
 
 export class Platform extends BaseObject {
-
+    constructor(x: number, y: number, ctx: CanvasRenderingContext2D) {
+        super(x, y, ctx);
+        this.movingLeft = true;
+        this.speed = 2;
+    }
 }
