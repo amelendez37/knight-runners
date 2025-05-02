@@ -1,3 +1,5 @@
+export type GameObjectType = BaseObject | Player;
+
 export class BaseObject {
     x: number;
     y: number;
@@ -12,9 +14,26 @@ export class BaseObject {
         this.y = y;
         this.movingRight = false;
         this.movingLeft = false;
-        this.speed = 5;
+        this.speed = 4;
         this.character = Object.assign(new Image(), { src: './assets/min-knight-128.png' });
         this.ctx = ctx;
+    }
+
+    checkCollision() {
+        // check if this object is colliding with any other interactable game object
+
+    }
+
+    update() {
+        if (this.movingRight) {
+            this.x += this.speed;
+        } else if (this.movingLeft) {
+            this.x -= this.speed;
+        }
+    }
+
+    draw() {
+        this.ctx.drawImage(this.character, this.x, this.y);
     }
 }
 
@@ -40,9 +59,11 @@ export class Player extends BaseObject {
                 this.movingLeft = false;
             }
         });
-    }
 
-    draw() {
-        this.ctx.drawImage(this.character, 0, 0);
+        // need to bind jump
     }
+}
+
+export class Platform extends BaseObject {
+
 }

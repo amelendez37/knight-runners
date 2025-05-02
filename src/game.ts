@@ -1,4 +1,4 @@
-import { Player } from './gameObjects';
+import { Player } from './classes/gameObjects';
 import { checkIsInBounds } from "./utils";
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -12,6 +12,7 @@ function gameLoop(gameObjects: any[]) {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     for (const object of gameObjects) {
+        object.update();
         object.draw();
     }
 

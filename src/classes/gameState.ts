@@ -1,0 +1,11 @@
+import { GameObjectType } from './gameObjects';
+
+export class GameState {
+    gameObjects: GameObjectType[] = [];
+
+    constructor() { }
+
+    addGameObject(gameObject: GameObjectType) {
+
+    }
+}
