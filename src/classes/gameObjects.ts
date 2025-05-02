@@ -14,53 +14,62 @@ export class BaseObject {
     y: number;
     movingRight: boolean;
     movingLeft: boolean;
-    speed: number;
+    speedLeft: number;
+    speedRight: number;
     gravity: number;
     model: HTMLImageElement;
-    #hitbox = {} as Hitbox;
+    hitbox = {} as Hitbox;
     ctx: CanvasRenderingContext2D;
     #gameState: GameState;
+
+    SPEED_LEFT_DEFAULT = 4;
+    SPEED_RIGHT_DEFAULT = 4;
+    GRAVITY_DEFAULT = 5;
 
     constructor(x: number, y: number, ctx: CanvasRenderingContext2D, gameState: GameState) {
         this.x = x;
         this.y = y;
         this.movingRight = false;
         this.movingLeft = false;
-        this.speed = 4;
-        this.gravity = 5;
+        this.speedLeft = this.SPEED_LEFT_DEFAULT;
+        this.speedRight = this.SPEED_RIGHT_DEFAULT;
+        this.gravity = this.GRAVITY_DEFAULT;
         this.model = new Image();
         this.ctx = ctx;
         this.#gameState = gameState;
     }
 
-    checkCollisionLeft() {
+    checkCollisions() {
+        // left collision
         if (this.getLeftBound() <= 0) {
-            return true;
+            this.speedLeft = 0;
+        } else {
+            this.speedLeft = this.SPEED_LEFT_DEFAULT;
         }
-        return false;
-    }
 
-    checkCollisionRight() {
+        // right collision
         if (this.getRightBound() >= this.#gameState.getScreenWidth()) {
-            return true;
+            this.speedRight = 0;
+        } else {
+            this.speedLeft = this.SPEED_RIGHT_DEFAULT;
         }
-        return false;
-    }
 
-    checkCollisionBottom() {
-        // todo: will remove this condition since the game will not have a floor in the future
-        if (this.y + this.getHitbox().height >= this.#gameState.getScreenHeight()) {
-            return true;
+        // bottom collision
+        if (this.getBottomBound() >= this.#gameState.getScreenHeight()) {
+            this.gravity = 0;
+        } else {
+            this.gravity = this.GRAVITY_DEFAULT;
         }
-        return false;
+
+        // top collision
     }
 
     setHitbox(hitbox: Hitbox) {
-        this.#hitbox = hitbox;
+        this.hitbox = hitbox;
     }
 
     getHitbox() {
-        return this.#hitbox;
+        return this.hitbox;
     }
 
     getLeftBound() {
@@ -80,21 +89,20 @@ export class BaseObject {
     }
 
     update() {
+        this.checkCollisions();
         // update horizontal movement
-        if (this.movingRight && !this.checkCollisionRight()) {
-            this.x += this.speed;
-        } else if (this.movingLeft && !this.checkCollisionLeft()) {
-            this.x -= this.speed;
+        if (this.movingRight) {
+            this.x += this.speedRight;
+        } else if (this.movingLeft) {
+            this.x -= this.speedLeft;
         }
 
         // update vertical movement
-        if (!this.checkCollisionBottom()) {
-            this.y += this.gravity;
-        }
+        this.y += this.gravity;
     }
 
     draw() {
-        this.ctx.strokeRect(this.getLeftBound(), this.y, this.getHitbox().width, this.getHitbox().height);
+        // this.ctx.strokeRect(this.getLeftBound(), this.getTopBound(), this.getHitbox().width, this.getHitbox().height);
         this.ctx.drawImage(this.model, this.x, this.y);
     }
 }
@@ -119,6 +127,14 @@ export class Player extends BaseObject {
             } else if (e.key === 'a') {
                 this.movingLeft = true;
             }
+
+            // jump
+            if (e.key === 'space') {
+                this.gravity = -15;
+                setTimeout(() => {
+                    this.gravity = 5;
+                }, 1000);
+            }
         });
 
         document.addEventListener('keyup', (e) => {
@@ -128,8 +144,6 @@ export class Player extends BaseObject {
                 this.movingLeft = false;
             }
         });
-
-        // todo: need to bind jump
     }
 }
 
@@ -137,6 +151,6 @@ export class Platform extends BaseObject {
     constructor(x: number, y: number, ctx: CanvasRenderingContext2D, gameState: GameState) {
         super(x, y, ctx, gameState);
         this.movingLeft = true;
-        this.speed = 2;
+        this.speedLeft = 2;
     }
 }
