@@ -5,6 +5,8 @@ export type GameObjectType = BaseObject | Player;
 interface Hitbox {
     width: number;
     height: number;
+    xOffset: number;
+    yOffset: number;
 }
 
 export class BaseObject {
@@ -32,14 +34,14 @@ export class BaseObject {
     }
 
     checkCollisionLeft() {
-        if (this.x - this.getHitbox().width <= 0) {
+        if (this.getLeftBound() <= 0) {
             return true;
         }
         return false;
     }
 
     checkCollisionRight() {
-        if (this.x + this.getHitbox().width >= this.#gameState.getScreenWidth()) {
+        if (this.getRightBound() >= this.#gameState.getScreenWidth()) {
             return true;
         }
         return false;
@@ -61,6 +63,22 @@ export class BaseObject {
         return this.#hitbox;
     }
 
+    getLeftBound() {
+        return this.x + this.getHitbox().xOffset;
+    }
+
+    getRightBound() {
+        return this.x + this.getHitbox().xOffset + this.getHitbox().width;
+    }
+
+    getBottomBound() {
+        return this.y + this.getHitbox().yOffset + this.getHitbox().height;
+    }
+
+    getTopBound() {
+        return this.y - this.getHitbox().yOffset;
+    }
+
     update() {
         // update horizontal movement
         if (this.movingRight && !this.checkCollisionRight()) {
@@ -76,6 +94,7 @@ export class BaseObject {
     }
 
     draw() {
+        this.ctx.strokeRect(this.getLeftBound(), this.y, this.getHitbox().width, this.getHitbox().height);
         this.ctx.drawImage(this.model, this.x, this.y);
     }
 }
@@ -85,8 +104,10 @@ export class Player extends BaseObject {
         super(x, y, ctx, gameState);
         this.model.src = './assets/min-knight-128.png';
         this.setHitbox({
-            width: 60,
+            width: 59,
             height: 121,
+            xOffset: 22,
+            yOffset: 0,
         });
         this.setupMovementControls();
     }
