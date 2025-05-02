@@ -6,6 +6,6 @@ export class GameState {
     constructor() { }
 
     addGameObject(gameObject: GameObjectType) {
-
+        this.gameObjects.push(gameObject);
     }
 }
