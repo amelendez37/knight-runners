@@ -86,6 +86,8 @@ export class BaseObject {
     // bottom collision
     if (this.getBottomBound() >= this.#gameState.getScreenHeight()) {
       this.gravity = 0;
+      // snap player to ground level they're colliding with in case of late collision detection
+      this.y = this.#gameState.getScreenHeight() - this.getHitbox().height;
     } else {
       this.gravity = this.GRAVITY_DEFAULT;
     }
@@ -111,7 +113,7 @@ export class BaseObject {
     // update vertical movement
     this.y += (this.gravity - this.verticalVelocity) * delta;
     if (this.verticalVelocity > 0) {
-      this.verticalVelocity -= Math.floor(this.JUMP_VELOCITY * delta);
+      this.verticalVelocity -= this.JUMP_VELOCITY * delta;
     } else {
       this.verticalVelocity = 0;
     }
@@ -140,7 +142,7 @@ export class Player extends BaseObject {
     this.model.src = './assets/min-knight-128.png';
     this.setHitbox({
       width: 59,
-      height: 121,
+      height: 123,
       xOffset: 22,
       yOffset: 0,
     });
