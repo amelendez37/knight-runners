@@ -30,20 +30,20 @@ function run() {
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
-    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT,
+    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT * 2,
     ctx,
     gameState
   );
 
-  // const startingPlatform = new Platform(
-  //   STARTING_PLATFORM_LOC.x,
-  //   STARTING_PLATFORM_LOC.y,
-  //   ctx,
-  //   gameState
-  // );
+  const startingPlatform = new Platform(
+    STARTING_PLATFORM_LOC.x,
+    STARTING_PLATFORM_LOC.y,
+    ctx,
+    gameState
+  );
 
   gameState.addPlayerObject(player);
-  // gameState.addPlatformObject(startingPlatform);
+  gameState.addPlatformObject(startingPlatform);
 
   gameLoop(gameState, ctx);
 }
