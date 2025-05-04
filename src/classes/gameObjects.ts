@@ -1,5 +1,6 @@
 import { GameState } from './gameState';
 import { PLAYER_HEIGHT, PLAYER_WIDTH, PLATFORM_HEIGHT, PLATFORM_WIDTH } from '../constants';
+import { Location } from '../types';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -11,8 +12,7 @@ interface Hitbox {
 }
 
 export class BaseObject {
-  x: number;
-  y: number;
+  loc: Location;
   movingRight: boolean;
   movingLeft: boolean;
   horizontalVelocity: number;
@@ -38,8 +38,7 @@ export class BaseObject {
     ctx: CanvasRenderingContext2D,
     gameState: GameState
   ) {
-    this.x = x;
-    this.y = y;
+    this.loc = { x, y };
     this.movingRight = false;
     this.movingLeft = false;
     this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
@@ -59,30 +58,30 @@ export class BaseObject {
   }
 
   getLeftBound() {
-    return this.x + this.getHitbox().xOffset;
+    return this.loc.x + this.getHitbox().xOffset;
   }
 
   getRightBound() {
-    return this.x + this.getHitbox().xOffset + this.getHitbox().width;
+    return this.loc.x + this.getHitbox().xOffset + this.getHitbox().width;
   }
 
   getBottomBound() {
-    return this.y + this.getHitbox().yOffset + this.getHitbox().height;
+    return this.loc.y + this.getHitbox().yOffset + this.getHitbox().height;
   }
 
   getTopBound() {
-    return this.y - this.getHitbox().yOffset;
+    return this.loc.y - this.getHitbox().yOffset;
   }
 
   draw() {
     // debug hitbox
-    this.ctx.strokeRect(
-      this.getLeftBound(),
-      this.getTopBound(),
-      this.getHitbox().width,
-      this.getHitbox().height
-    );
-    this.ctx.drawImage(this.model, this.x, this.y);
+    // this.ctx.strokeRect(
+    //   this.getLeftBound(),
+    //   this.getTopBound(),
+    //   this.getHitbox().width,
+    //   this.getHitbox().height
+    // );
+    this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
 }
 
@@ -106,6 +105,9 @@ export class Player extends BaseObject {
   }
 
   checkCollisions() {
+    for (const platform of this.gameState.getPlatformObjectsOnScreen()) {
+
+    }
     // horizontal collision
     if (
       (this.getLeftBound() <= 0 && this.movingLeft) ||
@@ -121,7 +123,7 @@ export class Player extends BaseObject {
     if (this.getBottomBound() >= this.gameState.getScreenHeight()) {
       this.gravity = 0;
       // snap player to ground level they're colliding with in case of late collision detection
-      this.y = this.gameState.getScreenHeight() - this.getHitbox().height;
+      this.loc.y = this.gameState.getScreenHeight() - this.getHitbox().height;
     } else {
       this.gravity = this.GRAVITY_DEFAULT;
     }
@@ -139,13 +141,13 @@ export class Player extends BaseObject {
     this.lastRenderTimestamp = now;
     // update horizontal movement
     if (this.movingRight) {
-      this.x += this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+      this.loc.x += this.horizontalVelocity * this.SPEED_CONSTANT * delta;
     } else if (this.movingLeft) {
-      this.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+      this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
     }
 
     // update vertical movement
-    this.y +=
+    this.loc.y +=
       (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
     if (this.verticalVelocity > 0) {
       this.verticalVelocity -= this.JUMP_VELOCITY * this.SPEED_CONSTANT * delta;

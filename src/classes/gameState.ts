@@ -1,18 +1,15 @@
 import { Player, Platform } from './gameObjects';
-import { Location } from '../types';
 
 export class GameState {
   #playerOjects: Player[] = [];
   #platformOjects: Platform[] = [];
   #screenBottomEdge: number;
   #screenRightEdge: number;
-  playerStartPos: Location;
 
   constructor() {
     // need to re assign this on window resize
     this.#screenBottomEdge = window.innerHeight;
     this.#screenRightEdge = window.innerWidth;
-    this.playerStartPos = { x: 0, y: this.#screenBottomEdge / 1.1 };
   }
 
   getPlayerObjects() {
@@ -21,6 +18,11 @@ export class GameState {
 
   getPlatformObjects() {
     return this.#platformOjects;
+  }
+
+  getPlatformObjectsOnScreen() {
+    // todo: return just the platforms that exist on screen for optimization, may need to separate platforms even further into sections
+    return this.getPlatformObjects();
   }
 
   addPlatformObject(platformOject: Platform) {
