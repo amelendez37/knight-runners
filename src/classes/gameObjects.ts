@@ -26,8 +26,8 @@ export class BaseObject {
 
   HORIZONTAL_VELOCITY_DEFAULT = 400;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  JUMP_VELOCITY = 800;
-  GRAVITY_DEFAULT = 200;
+  JUMP_VELOCITY = 2400;
+  GRAVITY_DEFAULT = 800;
 
   constructor(
     x: number,
@@ -110,15 +110,21 @@ export class BaseObject {
 
     // update vertical movement
     this.y += (this.gravity - this.verticalVelocity) * delta;
+    if (this.verticalVelocity > 0) {
+      this.verticalVelocity -= Math.floor(this.JUMP_VELOCITY * delta);
+    } else {
+      this.verticalVelocity = 0;
+    }
   }
 
   draw() {
-    // this.ctx.strokeRect(
-    //   this.getLeftBound(),
-    //   this.getTopBound(),
-    //   this.getHitbox().width,
-    //   this.getHitbox().height
-    // );
+    // debug hitbox
+    this.ctx.strokeRect(
+      this.getLeftBound(),
+      this.getTopBound(),
+      this.getHitbox().width,
+      this.getHitbox().height
+    );
     this.ctx.drawImage(this.model, this.x, this.y);
   }
 }
