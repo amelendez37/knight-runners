@@ -20,14 +20,16 @@ export class BaseObject {
   model: HTMLImageElement;
   hitbox = {} as Hitbox;
   ctx: CanvasRenderingContext2D;
-  #gameState: GameState;
+  gameState: GameState;
 
   lastRenderTimestamp = 0;
 
+  // constants
   HORIZONTAL_VELOCITY_DEFAULT = 400;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  JUMP_VELOCITY = 2400;
+  JUMP_VELOCITY = 1800;
   GRAVITY_DEFAULT = 800;
+  SPEED_CONSTANT = 1; // for tweaking speed of all objects
 
   constructor(
     x: number,
@@ -44,7 +46,7 @@ export class BaseObject {
     this.gravity = this.GRAVITY_DEFAULT;
     this.model = new Image();
     this.ctx = ctx;
-    this.#gameState = gameState;
+    this.gameState = gameState;
   }
 
   setHitbox(hitbox: Hitbox) {
@@ -71,54 +73,6 @@ export class BaseObject {
     return this.y - this.getHitbox().yOffset;
   }
 
-  checkCollisions() {
-    // horizontal collision
-    if (
-      (this.getLeftBound() <= 0 && this.movingLeft) ||
-      (this.getRightBound() >= this.#gameState.getScreenWidth() &&
-        this.movingRight)
-    ) {
-      this.horizontalVelocity = 0;
-    } else {
-      this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
-    }
-
-    // bottom collision
-    if (this.getBottomBound() >= this.#gameState.getScreenHeight()) {
-      this.gravity = 0;
-      // snap player to ground level they're colliding with in case of late collision detection
-      this.y = this.#gameState.getScreenHeight() - this.getHitbox().height;
-    } else {
-      this.gravity = this.GRAVITY_DEFAULT;
-    }
-  }
-
-  updateLocation() {
-    this.checkCollisions();
-    // movement is updated based on time not renders so that
-    // velocity does not change relative to fps
-    const now = Date.now() / 1000; // current timestamp in seconds
-    if (!this.lastRenderTimestamp) {
-      this.lastRenderTimestamp = now;
-    }
-    const delta = now - this.lastRenderTimestamp;
-    this.lastRenderTimestamp = now;
-    // update horizontal movement
-    if (this.movingRight) {
-      this.x += this.horizontalVelocity * delta;
-    } else if (this.movingLeft) {
-      this.x -= this.horizontalVelocity * delta;
-    }
-
-    // update vertical movement
-    this.y += (this.gravity - this.verticalVelocity) * delta;
-    if (this.verticalVelocity > 0) {
-      this.verticalVelocity -= this.JUMP_VELOCITY * delta;
-    } else {
-      this.verticalVelocity = 0;
-    }
-  }
-
   draw() {
     // debug hitbox
     this.ctx.strokeRect(
@@ -139,6 +93,7 @@ export class Player extends BaseObject {
     gameState: GameState
   ) {
     super(x, y, ctx, gameState);
+    this.gameState = gameState;
     this.model.src = './assets/min-knight-128.png';
     this.setHitbox({
       width: 59,
@@ -147,6 +102,55 @@ export class Player extends BaseObject {
       yOffset: 0,
     });
     this.setupMovementControls();
+  }
+
+  checkCollisions() {
+    // horizontal collision
+    if (
+      (this.getLeftBound() <= 0 && this.movingLeft) ||
+      (this.getRightBound() >= this.gameState.getScreenWidth() &&
+        this.movingRight)
+    ) {
+      this.horizontalVelocity = 0;
+    } else {
+      this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
+    }
+
+    // bottom collision
+    if (this.getBottomBound() >= this.gameState.getScreenHeight()) {
+      this.gravity = 0;
+      // snap player to ground level they're colliding with in case of late collision detection
+      this.y = this.gameState.getScreenHeight() - this.getHitbox().height;
+    } else {
+      this.gravity = this.GRAVITY_DEFAULT;
+    }
+  }
+
+  updateLocation() {
+    this.checkCollisions();
+    // movement is updated based on time not renders so that
+    // velocity does not change relative to fps
+    const now = Date.now() / 1000; // current timestamp in seconds
+    if (!this.lastRenderTimestamp) {
+      this.lastRenderTimestamp = now;
+    }
+    const delta = now - this.lastRenderTimestamp;
+    this.lastRenderTimestamp = now;
+    // update horizontal movement
+    if (this.movingRight) {
+      this.x += this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+    } else if (this.movingLeft) {
+      this.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+    }
+
+    // update vertical movement
+    this.y +=
+      (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
+    if (this.verticalVelocity > 0) {
+      this.verticalVelocity -= this.JUMP_VELOCITY * this.SPEED_CONSTANT * delta;
+    } else {
+      this.verticalVelocity = 0;
+    }
   }
 
   setupMovementControls() {
@@ -182,7 +186,14 @@ export class Platform extends BaseObject {
     gameState: GameState
   ) {
     super(x, y, ctx, gameState);
+    this.model.src = './assets/platform-min.png';
     this.movingLeft = true;
     this.horizontalVelocity = 2;
+    this.setHitbox({
+      width: 375,
+      height: 35,
+      yOffset: 0,
+      xOffset: 0,
+    });
   }
 }
