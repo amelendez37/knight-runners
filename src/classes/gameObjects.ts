@@ -1,4 +1,5 @@
 import { GameState } from './gameState';
+import { PLAYER_HEIGHT, PLAYER_WIDTH, PLATFORM_HEIGHT, PLATFORM_WIDTH } from '../constants';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -96,8 +97,8 @@ export class Player extends BaseObject {
     this.gameState = gameState;
     this.model.src = './assets/min-knight-128.png';
     this.setHitbox({
-      width: 59,
-      height: 123,
+      width: PLAYER_WIDTH,
+      height: PLAYER_HEIGHT,
       xOffset: 22,
       yOffset: 0,
     });
@@ -190,8 +191,8 @@ export class Platform extends BaseObject {
     this.movingLeft = true;
     this.horizontalVelocity = 2;
     this.setHitbox({
-      width: 375,
-      height: 35,
+      width: PLATFORM_WIDTH,
+      height: PLATFORM_HEIGHT,
       yOffset: 0,
       xOffset: 0,
     });

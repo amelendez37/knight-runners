@@ -1,5 +1,6 @@
 import { GameState } from './classes/gameState';
 import { Player, Platform } from './classes/gameObjects';
+import { PLAYER_HEIGHT, PLATFORM_HEIGHT } from './constants';
 
 function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, gameState.getScreenWidth(), gameState.getScreenHeight());
@@ -25,23 +26,24 @@ function run() {
   const gameState = new GameState();
   canvas.width = gameState.getScreenWidth();
   canvas.height = gameState.getScreenHeight();
+  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - 100 };
 
   const player = new Player(
-    gameState.playerStartPos.x,
-    gameState.playerStartPos.y / 2,
+    STARTING_PLATFORM_LOC.x,
+    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT,
     ctx,
     gameState
   );
 
-  const starterPlatform = new Platform(
-    gameState.playerStartPos.x,
-    gameState.playerStartPos.y / 2 + player.getHitbox().height + 10,
-    ctx,
-    gameState
-  );
+  // const startingPlatform = new Platform(
+  //   STARTING_PLATFORM_LOC.x,
+  //   STARTING_PLATFORM_LOC.y,
+  //   ctx,
+  //   gameState
+  // );
 
   gameState.addPlayerObject(player);
-  gameState.addPlatformObject(starterPlatform);
+  // gameState.addPlatformObject(startingPlatform);
 
   gameLoop(gameState, ctx);
 }
