@@ -5,7 +5,7 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, gameState.getScreenWidth(), gameState.getScreenHeight());
 
   for (const object of gameState.getGameObjects()) {
-    object.update();
+    object.updateLocation();
     object.draw();
   }
 

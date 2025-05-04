@@ -22,9 +22,12 @@ export class BaseObject {
   ctx: CanvasRenderingContext2D;
   #gameState: GameState;
 
-  HORIZONTAL_VELOCITY_DEFAULT = 8; // TODO: the feel of this changes based on fps
+  lastRenderTimestamp = 0;
+
+  HORIZONTAL_VELOCITY_DEFAULT = 400;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  GRAVITY_DEFAULT = 5;
+  JUMP_VELOCITY = 800;
+  GRAVITY_DEFAULT = 200;
 
   constructor(
     x: number,
@@ -86,21 +89,27 @@ export class BaseObject {
     } else {
       this.gravity = this.GRAVITY_DEFAULT;
     }
-
-    // top collision
   }
 
-  update() {
+  updateLocation() {
     this.checkCollisions();
+    // movement is updated based on time not renders so that
+    // velocity does not change relative to fps
+    const now = Date.now() / 1000; // current timestamp in seconds
+    if (!this.lastRenderTimestamp) {
+      this.lastRenderTimestamp = now;
+    }
+    const delta = now - this.lastRenderTimestamp;
+    this.lastRenderTimestamp = now;
     // update horizontal movement
     if (this.movingRight) {
-      this.x += this.horizontalVelocity;
+      this.x += this.horizontalVelocity * delta;
     } else if (this.movingLeft) {
-      this.x -= this.horizontalVelocity;
+      this.x -= this.horizontalVelocity * delta;
     }
 
     // update vertical movement
-    this.y += this.gravity - this.verticalVelocity;
+    this.y += (this.gravity - this.verticalVelocity) * delta;
   }
 
   draw() {
@@ -143,7 +152,7 @@ export class Player extends BaseObject {
 
       // jump
       if (e.key === ' ') {
-        this.verticalVelocity = 10;
+        this.verticalVelocity = this.JUMP_VELOCITY;
       }
     });
 
