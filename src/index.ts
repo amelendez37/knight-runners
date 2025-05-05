@@ -26,6 +26,14 @@ function run() {
   const gameState = new GameState();
   canvas.width = gameState.getScreenWidth();
   canvas.height = gameState.getScreenHeight();
+  // update game window when browser is resized
+  document.addEventListener('resize', function () {
+    // TODO: this isn't working. need to fix resizing
+    gameState.setScreenDimensions(window.innerWidth, window.innerHeight);
+    canvas.width = gameState.getScreenWidth();
+    canvas.height = gameState.getScreenHeight();
+  });
+
   const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - 100 };
 
   const player = new Player(

@@ -3,13 +3,13 @@ import { Player, Platform } from './gameObjects';
 export class GameState {
   #playerOjects: Player[] = [];
   #platformOjects: Platform[] = [];
-  #screenBottomEdge: number;
-  #screenRightEdge: number;
+  screenBottomEdge: number;
+  screenRightEdge: number;
 
   constructor() {
     // need to re assign this on window resize
-    this.#screenBottomEdge = window.innerHeight;
-    this.#screenRightEdge = window.innerWidth;
+    this.screenBottomEdge = window.innerHeight;
+    this.screenRightEdge = window.innerWidth;
   }
 
   getPlayerObjects() {
@@ -34,15 +34,15 @@ export class GameState {
   }
 
   setScreenDimensions(width: number, height: number) {
-    this.#screenRightEdge = width;
-    this.#screenBottomEdge = height;
+    this.screenRightEdge = width;
+    this.screenBottomEdge = height;
   }
 
   getScreenHeight() {
-    return this.#screenBottomEdge;
+    return this.screenBottomEdge;
   }
 
   getScreenWidth() {
-    return this.#screenRightEdge;
+    return this.screenRightEdge;
   }
 }
