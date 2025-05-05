@@ -204,8 +204,8 @@ export class Platform extends BaseObject {
     this.hitbox = {
       width: PLATFORM_WIDTH,
       height: PLATFORM_HEIGHT,
-      yOffset: 0,
-      xOffset: 0,
+      yOffset: -6,
+      xOffset: 5,
     };
   }
 }
