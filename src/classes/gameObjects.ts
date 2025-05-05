@@ -9,6 +9,7 @@ interface Hitbox {
   height: number;
   xOffset: number;
   yOffset: number;
+  isOnGround?: boolean;
 }
 
 export class BaseObject {
@@ -30,7 +31,7 @@ export class BaseObject {
   VERTICAL_VELOCITY_DEFAULT = 0;
   JUMP_VELOCITY = 1800;
   GRAVITY_DEFAULT = 800;
-  SPEED_CONSTANT = 1; // for tweaking speed of all objects
+  SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
     x: number,
@@ -49,28 +50,20 @@ export class BaseObject {
     this.gameState = gameState;
   }
 
-  setHitbox(hitbox: Hitbox) {
-    this.hitbox = hitbox;
-  }
-
-  getHitbox() {
-    return this.hitbox;
-  }
-
   getLeftBound() {
-    return this.loc.x + this.getHitbox().xOffset;
+    return this.loc.x + this.hitbox.xOffset;
   }
 
   getRightBound() {
-    return this.loc.x + this.getHitbox().xOffset + this.getHitbox().width;
+    return this.loc.x + this.hitbox.xOffset + this.hitbox.width;
   }
 
   getBottomBound() {
-    return this.loc.y + this.getHitbox().yOffset + this.getHitbox().height;
+    return this.loc.y + this.hitbox.yOffset + this.hitbox.height;
   }
 
   getTopBound() {
-    return this.loc.y - this.getHitbox().yOffset;
+    return this.loc.y - this.hitbox.yOffset;
   }
 
   draw() {
@@ -78,8 +71,8 @@ export class BaseObject {
     // this.ctx.strokeRect(
     //   this.getLeftBound(),
     //   this.getTopBound(),
-    //   this.getHitbox().width,
-    //   this.getHitbox().height
+    //   this.hitbox.width,
+    //   this.hitbox.height
     // );
     this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
@@ -95,18 +88,21 @@ export class Player extends BaseObject {
     super(x, y, ctx, gameState);
     this.gameState = gameState;
     this.model.src = './assets/min-knight-128.png';
-    this.setHitbox({
+    this.hitbox = {
       width: PLAYER_WIDTH,
       height: PLAYER_HEIGHT,
       xOffset: 22,
       yOffset: 0,
-    });
+    };
     this.setupMovementControls();
   }
 
   checkCollisions() {
     for (const platform of this.gameState.getPlatformObjectsOnScreen()) {
+      // if player is in between x and y ranges of the platform then it's a collision
+      // if (this.getRightBound() ) {
 
+      // }
     }
     // horizontal collision
     if (
@@ -123,7 +119,8 @@ export class Player extends BaseObject {
     if (this.getBottomBound() >= this.gameState.getScreenHeight()) {
       this.gravity = 0;
       // snap player to ground level they're colliding with in case of late collision detection
-      this.loc.y = this.gameState.getScreenHeight() - this.getHitbox().height;
+      this.loc.y = this.gameState.getScreenHeight() - this.hitbox.height;
+      this.hitbox.isOnGround = true;
     } else {
       this.gravity = this.GRAVITY_DEFAULT;
     }
@@ -159,22 +156,23 @@ export class Player extends BaseObject {
   setupMovementControls() {
     document.addEventListener('keydown', (e) => {
       // right and left movements
-      if (e.key === 'd') {
+      if (e.key === 'ArrowRight') {
         this.movingRight = true;
-      } else if (e.key === 'a') {
+      } else if (e.key === 'ArrowLeft') {
         this.movingLeft = true;
       }
 
       // jump
-      if (e.key === ' ') {
+      if (e.key === ' ' && this.hitbox.isOnGround) {
         this.verticalVelocity = this.JUMP_VELOCITY;
+        this.hitbox.isOnGround = false;
       }
     });
 
     document.addEventListener('keyup', (e) => {
-      if (e.key === 'd') {
+      if (e.key === 'ArrowRight') {
         this.movingRight = false;
-      } else if (e.key === 'a') {
+      } else if (e.key === 'ArrowLeft') {
         this.movingLeft = false;
       }
     });
@@ -192,11 +190,11 @@ export class Platform extends BaseObject {
     this.model.src = './assets/platform-min.png';
     this.movingLeft = true;
     this.horizontalVelocity = 2;
-    this.setHitbox({
+    this.hitbox = {
       width: PLATFORM_WIDTH,
       height: PLATFORM_HEIGHT,
       yOffset: 0,
       xOffset: 0,
-    });
+    };
   }
 }
