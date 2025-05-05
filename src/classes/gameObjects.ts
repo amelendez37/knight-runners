@@ -1,5 +1,11 @@
 import { GameState } from './gameState';
-import { PLAYER_HEIGHT, PLAYER_WIDTH, PLATFORM_HEIGHT, PLATFORM_WIDTH } from '../constants';
+import {
+  PLAYER_HEIGHT,
+  PLAYER_WIDTH,
+  PLATFORM_HEIGHT,
+  PLATFORM_WIDTH,
+  COLLISION_OFFSET,
+} from '../constants';
 import { Location } from '../types';
 
 export type GameObjectType = BaseObject | Player;
@@ -68,12 +74,12 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    // this.ctx.strokeRect(
-    //   this.getLeftBound(),
-    //   this.getTopBound(),
-    //   this.hitbox.width,
-    //   this.hitbox.height
-    // );
+    this.ctx.strokeRect(
+      this.getLeftBound(),
+      this.getTopBound(),
+      this.hitbox.width,
+      this.hitbox.height
+    );
     this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
 }
@@ -100,29 +106,34 @@ export class Player extends BaseObject {
   checkCollisions() {
     for (const platform of this.gameState.getPlatformObjectsOnScreen()) {
       // if player is in between x and y ranges of the platform then it's a collision
-      // if (this.getRightBound() ) {
+      const playerLeftSideCollision =
+        this.movingLeft &&
+        this.getLeftBound() <= platform.getRightBound() &&
+        this.getTopBound() <= platform.getBottomBound() + COLLISION_OFFSET &&
+        this.getBottomBound() >= platform.getTopBound() + COLLISION_OFFSET;
+      const playerRightSideCollision =
+        this.movingRight &&
+        this.getRightBound() >= platform.getLeftBound() &&
+        this.getTopBound() <= platform.getBottomBound() + COLLISION_OFFSET &&
+        this.getBottomBound() >= platform.getTopBound() + COLLISION_OFFSET;
+      if (playerLeftSideCollision || playerRightSideCollision) {
+        this.horizontalVelocity = 0;
+      } else {
+        this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
+      }
 
-      // }
-    }
-    // horizontal collision
-    if (
-      (this.getLeftBound() <= 0 && this.movingLeft) ||
-      (this.getRightBound() >= this.gameState.getScreenWidth() &&
-        this.movingRight)
-    ) {
-      this.horizontalVelocity = 0;
-    } else {
-      this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
-    }
-
-    // bottom collision
-    if (this.getBottomBound() >= this.gameState.getScreenHeight()) {
-      this.gravity = 0;
-      // snap player to ground level they're colliding with in case of late collision detection
-      this.loc.y = this.gameState.getScreenHeight() - this.hitbox.height;
-      this.hitbox.isOnGround = true;
-    } else {
-      this.gravity = this.GRAVITY_DEFAULT;
+      const playerBottomCollision =
+        this.getRightBound() >= platform.getLeftBound() + COLLISION_OFFSET &&
+        this.getLeftBound() <= platform.getRightBound() - COLLISION_OFFSET &&
+        this.getBottomBound() >= platform.getTopBound();
+      if (playerBottomCollision) {
+        this.gravity = 0;
+        // snap player to ground level they're colliding with in case of late collision detection
+        this.loc.y = platform.getTopBound() - this.hitbox.height;
+        this.hitbox.isOnGround = true;
+      } else {
+        this.gravity = this.GRAVITY_DEFAULT;
+      }
     }
   }
 
@@ -188,8 +199,8 @@ export class Platform extends BaseObject {
   ) {
     super(x, y, ctx, gameState);
     this.model.src = './assets/platform-min.png';
-    this.movingLeft = true;
-    this.horizontalVelocity = 2;
+    // this.movingLeft = true;
+    // this.horizontalVelocity = 2;
     this.hitbox = {
       width: PLATFORM_WIDTH,
       height: PLATFORM_HEIGHT,

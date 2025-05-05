@@ -18,20 +18,21 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   requestAnimationFrame(() => gameLoop(gameState, ctx));
 }
 
+function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
+  gameState.setScreenDimensions(window.innerWidth, window.innerHeight);
+  canvas.width = gameState.getScreenWidth();
+  canvas.height = gameState.getScreenHeight();
+}
+
 function run() {
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   // gives us methods to draw within our 2d canvas element
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
   const gameState = new GameState();
-  canvas.width = gameState.getScreenWidth();
-  canvas.height = gameState.getScreenHeight();
-  // update game window when browser is resized
-  document.addEventListener('resize', function () {
-    // TODO: this isn't working. need to fix resizing
-    gameState.setScreenDimensions(window.innerWidth, window.innerHeight);
-    canvas.width = gameState.getScreenWidth();
-    canvas.height = gameState.getScreenHeight();
+  setWindowSize(canvas, gameState);
+  window.addEventListener('resize', function () {
+    setWindowSize(canvas, gameState);
   });
 
   const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - 100 };
