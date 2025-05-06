@@ -39,7 +39,7 @@ function run() {
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
-    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT * 2,
+    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT,
     ctx,
     gameState
   );

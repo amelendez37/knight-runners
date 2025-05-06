@@ -109,11 +109,13 @@ export class Player extends BaseObject {
       const playerLeftSideCollision =
         this.movingLeft &&
         this.getLeftBound() <= platform.getRightBound() &&
+        this.getLeftBound() >= platform.getLeftBound() &&
         this.getTopBound() <= platform.getBottomBound() + COLLISION_OFFSET &&
         this.getBottomBound() >= platform.getTopBound() + COLLISION_OFFSET;
       const playerRightSideCollision =
         this.movingRight &&
         this.getRightBound() >= platform.getLeftBound() &&
+        this.getRightBound() <= platform.getRightBound() &&
         this.getTopBound() <= platform.getBottomBound() + COLLISION_OFFSET &&
         this.getBottomBound() >= platform.getTopBound() + COLLISION_OFFSET;
       if (playerLeftSideCollision || playerRightSideCollision) {
@@ -125,7 +127,8 @@ export class Player extends BaseObject {
       const playerBottomCollision =
         this.getRightBound() >= platform.getLeftBound() + COLLISION_OFFSET &&
         this.getLeftBound() <= platform.getRightBound() - COLLISION_OFFSET &&
-        this.getBottomBound() >= platform.getTopBound();
+        this.getBottomBound() >= platform.getTopBound() &&
+        this.getBottomBound() <= platform.getBottomBound();
       if (playerBottomCollision) {
         this.gravity = 0;
         // snap player to ground level they're colliding with in case of late collision detection
