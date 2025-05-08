@@ -1,6 +1,6 @@
 import { GameState } from './classes/gameState';
 import { Player, Platform } from './classes/gameObjects';
-import { PLAYER_HEIGHT, PLATFORM_HEIGHT } from './constants';
+import { PLAYER_HEIGHT, COLLISION_OFFSET } from './constants';
 
 function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, gameState.getScreenWidth(), gameState.getScreenHeight());
@@ -39,22 +39,28 @@ function run() {
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
-    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT,
+    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT + COLLISION_OFFSET,
     ctx,
     gameState
   );
+  gameState.addPlayerObject(player);
 
+  // initial platform players start on
   const startingPlatform = new Platform(
     STARTING_PLATFORM_LOC.x,
     STARTING_PLATFORM_LOC.y,
     ctx,
     gameState
   );
-
-  // todo: create rest of platforms here. They will be recycled throughout the game and can be reassigned locs
-
-  gameState.addPlayerObject(player);
   gameState.addPlatformObject(startingPlatform);
+
+  // rest of platforms that spawn in the game. These platforms are reused throughout session for efficiency
+  for (let i = 0; i < 9; i++) {
+    const currPlatforms = gameState.getPlatformObjects();
+    const lastPlatform = currPlatforms[currPlatforms.length - 1];
+    const platform = new Platform(lastPlatform.loc.x + 250, lastPlatform.loc.y - 50, ctx, gameState);
+    gameState.addPlatformObject(platform);
+  }
 
   gameLoop(gameState, ctx);
 }
