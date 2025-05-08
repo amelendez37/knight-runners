@@ -37,7 +37,6 @@ export class BaseObject {
   // constants
   HORIZONTAL_VELOCITY_DEFAULT = .156;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  JUMP_VELOCITY = .703;
   GRAVITY_DEFAULT = .313;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
@@ -53,7 +52,6 @@ export class BaseObject {
     this.horizontalVelocity = gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
     this.verticalVelocity = gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
     this.gravity = gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
-    this.jumpVelocity = gameState.getScreenHeight() * this.JUMP_VELOCITY;
     this.model = new Image();
     this.ctx = ctx;
     this.gameState = gameState;
@@ -77,17 +75,21 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    // this.ctx.strokeRect(
-    //   this.getLeftBound(),
-    //   this.getTopBound(),
-    //   this.hitbox.width,
-    //   this.hitbox.height
-    // );
+    this.ctx.strokeRect(
+      this.getLeftBound(),
+      this.getTopBound(),
+      this.hitbox.width,
+      this.hitbox.height
+    );
     this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
 }
 
 export class Player extends BaseObject {
+  jumpVelocity: number;
+
+  JUMP_VELOCITY = .703;
+
   constructor(
     x: number,
     y: number,
@@ -104,6 +106,7 @@ export class Player extends BaseObject {
       yOffset: gameState.getScreenHeight() * PLAYER_HITBOX_Y_OFFSET,
     };
     this.setupMovementControls();
+    this.jumpVelocity = gameState.getScreenHeight() * this.JUMP_VELOCITY;
   }
 
   checkCollisions() {

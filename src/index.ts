@@ -39,7 +39,7 @@ function run() {
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
-    STARTING_PLATFORM_LOC.y - PLAYER_HEIGHT + COLLISION_OFFSET,
+    STARTING_PLATFORM_LOC.y - (PLAYER_HEIGHT * gameState.getScreenHeight()) + COLLISION_OFFSET,
     ctx,
     gameState
   );
@@ -58,7 +58,7 @@ function run() {
   for (let i = 0; i < 9; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
-    const platform = new Platform(lastPlatform.loc.x + 250, lastPlatform.loc.y - 50, ctx, gameState);
+    const platform = new Platform(lastPlatform.loc.x + (.098 * gameState.getScreenWidth()), lastPlatform.loc.y - (.020 * gameState.getScreenHeight()), ctx, gameState);
     gameState.addPlatformObject(platform);
   }
 
