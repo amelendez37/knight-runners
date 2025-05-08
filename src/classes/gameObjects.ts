@@ -37,7 +37,7 @@ export class BaseObject {
   // constants
   HORIZONTAL_VELOCITY_DEFAULT = .15;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  GRAVITY_DEFAULT = .2;
+  GRAVITY_DEFAULT = .4;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
@@ -88,7 +88,7 @@ export class BaseObject {
 export class Player extends BaseObject {
   jumpVelocity: number;
 
-  JUMP_VELOCITY = .703;
+  JUMP_VELOCITY = .85;
 
   constructor(
     x: number,
@@ -166,10 +166,15 @@ export class Player extends BaseObject {
     }
 
     // update vertical movement
+    const oldY = this.loc.y;
     this.loc.y +=
       (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
     if (this.verticalVelocity > 0) {
-      this.verticalVelocity -= this.jumpVelocity * this.SPEED_CONSTANT * delta;
+      if (oldY < this.loc.y) {
+        this.verticalVelocity -= this.gravity * 2 * this.SPEED_CONSTANT * delta;
+      } else {
+        this.verticalVelocity -= this.gravity * this.SPEED_CONSTANT * delta;
+      }
     } else {
       this.verticalVelocity = 0;
     }
