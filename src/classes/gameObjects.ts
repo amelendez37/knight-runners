@@ -35,9 +35,9 @@ export class BaseObject {
   lastRenderTimestamp = 0;
 
   // constants
-  HORIZONTAL_VELOCITY_DEFAULT = .156;
+  HORIZONTAL_VELOCITY_DEFAULT = .15;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  GRAVITY_DEFAULT = .313;
+  GRAVITY_DEFAULT = .2;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
@@ -127,7 +127,7 @@ export class Player extends BaseObject {
       if (playerLeftSideCollision || playerRightSideCollision) {
         this.horizontalVelocity = 0;
       } else {
-        this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
+        this.horizontalVelocity = this.gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
       }
 
       const playerBottomCollision =

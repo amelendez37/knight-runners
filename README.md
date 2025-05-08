@@ -6,3 +6,4 @@
 ## todo
 1. all movements and object positions need to be scaled to a percentage of screen dimensions
 2. scale all art asset sizes
+3. redraw everything on window resize
