@@ -35,10 +35,9 @@ export class BaseObject {
   lastRenderTimestamp = 0;
 
   // constants
-  HORIZONTAL_VELOCITY_DEFAULT = 400;
+  HORIZONTAL_VELOCITY_DEFAULT = .15;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  JUMP_VELOCITY = 1800;
-  GRAVITY_DEFAULT = 800;
+  GRAVITY_DEFAULT = .2;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
@@ -50,9 +49,9 @@ export class BaseObject {
     this.loc = { x, y };
     this.movingRight = false;
     this.movingLeft = false;
-    this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
-    this.verticalVelocity = this.VERTICAL_VELOCITY_DEFAULT;
-    this.gravity = this.GRAVITY_DEFAULT;
+    this.horizontalVelocity = gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
+    this.verticalVelocity = gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
+    this.gravity = gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
     this.model = new Image();
     this.ctx = ctx;
     this.gameState = gameState;
@@ -76,17 +75,21 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    // this.ctx.strokeRect(
-    //   this.getLeftBound(),
-    //   this.getTopBound(),
-    //   this.hitbox.width,
-    //   this.hitbox.height
-    // );
+    this.ctx.strokeRect(
+      this.getLeftBound(),
+      this.getTopBound(),
+      this.hitbox.width,
+      this.hitbox.height
+    );
     this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
 }
 
 export class Player extends BaseObject {
+  jumpVelocity: number;
+
+  JUMP_VELOCITY = .703;
+
   constructor(
     x: number,
     y: number,
@@ -103,6 +106,7 @@ export class Player extends BaseObject {
       yOffset: gameState.getScreenHeight() * PLAYER_HITBOX_Y_OFFSET,
     };
     this.setupMovementControls();
+    this.jumpVelocity = gameState.getScreenHeight() * this.JUMP_VELOCITY;
   }
 
   checkCollisions() {
@@ -123,7 +127,7 @@ export class Player extends BaseObject {
       if (playerLeftSideCollision || playerRightSideCollision) {
         this.horizontalVelocity = 0;
       } else {
-        this.horizontalVelocity = this.HORIZONTAL_VELOCITY_DEFAULT;
+        this.horizontalVelocity = this.gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
       }
 
       const playerBottomCollision =
@@ -138,7 +142,7 @@ export class Player extends BaseObject {
         this.hitbox.isOnGround = true;
         break;
       } else {
-        this.gravity = this.GRAVITY_DEFAULT;
+        this.gravity = this.gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
         this.hitbox.isOnGround = false;
       }
     }
@@ -165,7 +169,7 @@ export class Player extends BaseObject {
     this.loc.y +=
       (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
     if (this.verticalVelocity > 0) {
-      this.verticalVelocity -= this.JUMP_VELOCITY * this.SPEED_CONSTANT * delta;
+      this.verticalVelocity -= this.jumpVelocity * this.SPEED_CONSTANT * delta;
     } else {
       this.verticalVelocity = 0;
     }
@@ -182,7 +186,7 @@ export class Player extends BaseObject {
 
       // jump
       if (e.key === ' ' && this.hitbox.isOnGround) {
-        this.verticalVelocity = this.JUMP_VELOCITY;
+        this.verticalVelocity = this.jumpVelocity;
         this.hitbox.isOnGround = false;
       }
     });
