@@ -142,7 +142,7 @@ export class Player extends BaseObject {
         this.hitbox.isOnGround = true;
         break;
       } else {
-        this.gravity = this.GRAVITY_DEFAULT;
+        this.gravity = this.gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
         this.hitbox.isOnGround = false;
       }
     }
