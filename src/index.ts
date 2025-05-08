@@ -35,7 +35,7 @@ function run() {
     setWindowSize(canvas, gameState);
   });
 
-  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (.04 * gameState.getScreenHeight()) };
+  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleHeight(.04)) };
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
@@ -58,7 +58,7 @@ function run() {
   for (let i = 0; i < 9; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
-    const platform = new Platform(lastPlatform.loc.x + (.098 * gameState.getScreenWidth()), lastPlatform.loc.y - (.020 * gameState.getScreenHeight()), ctx, gameState);
+    const platform = new Platform(lastPlatform.loc.x + gameState.scaleWidth(.098), lastPlatform.loc.y - gameState.scaleHeight(.020), ctx, gameState);
     gameState.addPlatformObject(platform);
   }
 

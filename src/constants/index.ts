@@ -3,6 +3,8 @@ export const PLAYER_HEIGHT = .096;
 export const PLAYER_WIDTH = .023;
 export const PLAYER_HITBOX_X_OFFSET = .009;
 export const PLAYER_HITBOX_Y_OFFSET = 0;
+export const PLAYER_ASSET_WIDTH = .05;
+export const PLAYER_ASSET_HEIGHT = .10;
 
 // Platform
 export const PLATFORM_HEIGHT = .02;

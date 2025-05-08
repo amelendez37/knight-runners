@@ -2,6 +2,8 @@ import { GameState } from './gameState';
 import {
   PLAYER_HEIGHT,
   PLAYER_WIDTH,
+  PLAYER_ASSET_WIDTH,
+  PLAYER_ASSET_HEIGHT,
   PLATFORM_HEIGHT,
   PLATFORM_WIDTH,
   COLLISION_OFFSET,
@@ -20,6 +22,12 @@ interface Hitbox {
   isOnGround?: boolean;
 }
 
+interface Sprite {
+  img: HTMLImageElement;
+  height: number;
+  width: number;
+}
+
 export class BaseObject {
   loc: Location;
   movingRight: boolean;
@@ -27,7 +35,7 @@ export class BaseObject {
   horizontalVelocity: number;
   verticalVelocity: number;
   gravity: number;
-  model: HTMLImageElement;
+  sprite: Sprite;
   hitbox = {} as Hitbox;
   ctx: CanvasRenderingContext2D;
   gameState: GameState;
@@ -52,7 +60,7 @@ export class BaseObject {
     this.horizontalVelocity = gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
     this.verticalVelocity = gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
     this.gravity = gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
-    this.model = new Image();
+    this.sprite = { img: new Image(), width: 0, height: 0 };
     this.ctx = ctx;
     this.gameState = gameState;
   }
@@ -81,7 +89,7 @@ export class BaseObject {
       this.hitbox.width,
       this.hitbox.height
     );
-    this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
+    this.ctx.drawImage(this.sprite.img, this.loc.x, this.loc.y, this.sprite.width, this.sprite.height);
   }
 }
 
@@ -98,15 +106,18 @@ export class Player extends BaseObject {
   ) {
     super(x, y, ctx, gameState);
     this.gameState = gameState;
-    this.model.src = './assets/min-knight-128.png';
+    this.sprite.img.src = './assets/min-knight-128.png';
+    this.sprite.height = this.gameState.scaleHeight(PLAYER_ASSET_HEIGHT);
+    this.sprite.width = this.gameState.scaleWidth(PLAYER_ASSET_WIDTH);
     this.hitbox = {
-      width: gameState.getScreenWidth() * PLAYER_WIDTH,
-      height: gameState.getScreenHeight() * PLAYER_HEIGHT,
-      xOffset: gameState.getScreenWidth() * PLAYER_HITBOX_X_OFFSET,
-      yOffset: gameState.getScreenHeight() * PLAYER_HITBOX_Y_OFFSET,
+      width: this.gameState.scaleWidth(PLAYER_WIDTH),
+      height: this.gameState.scaleHeight(PLAYER_HEIGHT),
+      xOffset: this.gameState.scaleWidth(PLAYER_HITBOX_X_OFFSET),
+      yOffset: this.gameState.scaleHeight(PLAYER_HITBOX_Y_OFFSET),
     };
+    this.jumpVelocity = this.gameState.scaleHeight(this.JUMP_VELOCITY);
+
     this.setupMovementControls();
-    this.jumpVelocity = gameState.getScreenHeight() * this.JUMP_VELOCITY;
   }
 
   checkCollisions() {
@@ -127,7 +138,7 @@ export class Player extends BaseObject {
       if (playerLeftSideCollision || playerRightSideCollision) {
         this.horizontalVelocity = 0;
       } else {
-        this.horizontalVelocity = this.gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
+        this.horizontalVelocity = this.gameState.scaleWidth(this.HORIZONTAL_VELOCITY_DEFAULT);
       }
 
       const playerBottomCollision =
@@ -142,7 +153,7 @@ export class Player extends BaseObject {
         this.hitbox.isOnGround = true;
         break;
       } else {
-        this.gravity = this.gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
+        this.gravity = this.gameState.scaleHeight(this.GRAVITY_DEFAULT);
         this.hitbox.isOnGround = false;
       }
     }
@@ -214,12 +225,12 @@ export class Platform extends BaseObject {
     gameState: GameState
   ) {
     super(x, y, ctx, gameState);
-    this.model.src = './assets/platform-min.png';
+    this.sprite.img.src = './assets/platform-min.png';
     // this.movingLeft = true;
     // this.horizontalVelocity = 2;
     this.hitbox = {
-      width: gameState.getScreenWidth() * PLATFORM_WIDTH,
-      height: gameState.getScreenHeight() * PLATFORM_HEIGHT,
+      width: this.gameState.scaleWidth(PLATFORM_WIDTH),
+      height: this.gameState.scaleHeight(PLATFORM_HEIGHT),
       yOffset: -6,
       xOffset: 5,
     };
