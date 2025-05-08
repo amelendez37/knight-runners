@@ -5,6 +5,8 @@ import {
   PLATFORM_HEIGHT,
   PLATFORM_WIDTH,
   COLLISION_OFFSET,
+  PLAYER_HITBOX_X_OFFSET,
+  PLAYER_HITBOX_Y_OFFSET,
 } from '../constants';
 import { Location } from '../types';
 
@@ -74,12 +76,12 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    this.ctx.strokeRect(
-      this.getLeftBound(),
-      this.getTopBound(),
-      this.hitbox.width,
-      this.hitbox.height
-    );
+    // this.ctx.strokeRect(
+    //   this.getLeftBound(),
+    //   this.getTopBound(),
+    //   this.hitbox.width,
+    //   this.hitbox.height
+    // );
     this.ctx.drawImage(this.model, this.loc.x, this.loc.y);
   }
 }
@@ -95,10 +97,10 @@ export class Player extends BaseObject {
     this.gameState = gameState;
     this.model.src = './assets/min-knight-128.png';
     this.hitbox = {
-      width: PLAYER_WIDTH,
-      height: PLAYER_HEIGHT,
-      xOffset: 22,
-      yOffset: 0,
+      width: gameState.getScreenWidth() * PLAYER_WIDTH,
+      height: gameState.getScreenHeight() * PLAYER_HEIGHT,
+      xOffset: gameState.getScreenWidth() * PLAYER_HITBOX_X_OFFSET,
+      yOffset: gameState.getScreenHeight() * PLAYER_HITBOX_Y_OFFSET,
     };
     this.setupMovementControls();
   }
@@ -207,8 +209,8 @@ export class Platform extends BaseObject {
     // this.movingLeft = true;
     // this.horizontalVelocity = 2;
     this.hitbox = {
-      width: PLATFORM_WIDTH,
-      height: PLATFORM_HEIGHT,
+      width: gameState.getScreenWidth() * PLATFORM_WIDTH,
+      height: gameState.getScreenHeight() * PLATFORM_HEIGHT,
       yOffset: -6,
       xOffset: 5,
     };

@@ -35,7 +35,7 @@ function run() {
     setWindowSize(canvas, gameState);
   });
 
-  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - 100 };
+  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (.04 * gameState.getScreenHeight()) };
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
