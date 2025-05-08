@@ -51,6 +51,8 @@ function run() {
     gameState
   );
 
+  // todo: create rest of platforms here. They will be recycled throughout the game and can be reassigned locs
+
   gameState.addPlayerObject(player);
   gameState.addPlatformObject(startingPlatform);
 
