@@ -134,8 +134,10 @@ export class Player extends BaseObject {
         // snap player to ground level they're colliding with in case of late collision detection
         this.loc.y = platform.getTopBound() - this.hitbox.height;
         this.hitbox.isOnGround = true;
+        break;
       } else {
         this.gravity = this.GRAVITY_DEFAULT;
+        this.hitbox.isOnGround = false;
       }
     }
   }
