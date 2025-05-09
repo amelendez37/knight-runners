@@ -53,4 +53,9 @@ export class GameState {
   scaleHeight(height: number) {
     return this.getScreenHeight() * height;
   }
+
+  clearGameState() {
+    this.#playerOjects = [];
+    this.#platformOjects = [];
+  }
 }
