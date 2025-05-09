@@ -107,20 +107,21 @@ export class Player extends BaseObject {
     super(x, y, ctx, gameState);
     this.gameState = gameState;
     this.sprite.img.src = './assets/min-knight-128.png';
-    this.sprite.height = this.gameState.scaleHeight(PLAYER_ASSET_HEIGHT);
-    this.sprite.width = this.gameState.scaleWidth(PLAYER_ASSET_WIDTH);
+    this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
+    this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
     this.hitbox = {
-      width: this.gameState.scaleWidth(PLAYER_WIDTH),
-      height: this.gameState.scaleHeight(PLAYER_HEIGHT),
-      xOffset: this.gameState.scaleWidth(PLAYER_HITBOX_X_OFFSET),
-      yOffset: this.gameState.scaleHeight(PLAYER_HITBOX_Y_OFFSET),
+      width: this.gameState.scaleX(PLAYER_WIDTH),
+      height: this.gameState.scaleY(PLAYER_HEIGHT),
+      xOffset: this.gameState.scaleX(PLAYER_HITBOX_X_OFFSET),
+      yOffset: this.gameState.scaleY(PLAYER_HITBOX_Y_OFFSET),
     };
-    this.jumpVelocity = this.gameState.scaleHeight(this.JUMP_VELOCITY);
+    this.jumpVelocity = this.gameState.scaleY(this.JUMP_VELOCITY);
 
     this.setupMovementControls();
   }
 
   checkCollisions() {
+    let noBottomCollisionCount = 0;
     for (const platform of this.gameState.getPlatformObjectsOnScreen()) {
       // if player is in between x and y ranges of the platform then it's a collision
       const playerLeftSideCollision =
@@ -138,7 +139,7 @@ export class Player extends BaseObject {
       if (playerLeftSideCollision || playerRightSideCollision) {
         this.horizontalVelocity = 0;
       } else {
-        this.horizontalVelocity = this.gameState.scaleWidth(this.HORIZONTAL_VELOCITY_DEFAULT);
+        this.horizontalVelocity = this.gameState.scaleX(this.HORIZONTAL_VELOCITY_DEFAULT);
       }
 
       const playerBottomCollision =
@@ -146,16 +147,20 @@ export class Player extends BaseObject {
         this.getLeftBound() <= platform.getRightBound() - COLLISION_OFFSET &&
         this.getBottomBound() >= platform.getTopBound() &&
         this.getBottomBound() <= platform.getBottomBound();
+      // only have bottom collision be false if we KNOW that every single platform has returned false
       if (playerBottomCollision) {
         this.gravity = 0;
         // snap player to ground level they're colliding with in case of late collision detection
-        this.loc.y = platform.getTopBound() - this.hitbox.height;
+        this.loc.y = platform.getTopBound() - (this.hitbox.height + this.hitbox.yOffset);
         this.hitbox.isOnGround = true;
-        break;
-      } else {
-        this.gravity = this.gameState.scaleHeight(this.GRAVITY_DEFAULT);
-        this.hitbox.isOnGround = false;
+        return;
       }
+      // todo: figure out why gravity is never set after jump
+      if (noBottomCollisionCount === this.gameState.getPlatformObjectsOnScreen().length) {
+        this.gravity = this.gameState.scaleY(this.GRAVITY_DEFAULT);
+      }
+      noBottomCollisionCount += 1;
+      this.hitbox.isOnGround = false;
     }
   }
 
@@ -229,8 +234,8 @@ export class Platform extends BaseObject {
     // this.movingLeft = true;
     // this.horizontalVelocity = 2;
     this.hitbox = {
-      width: this.gameState.scaleWidth(PLATFORM_WIDTH),
-      height: this.gameState.scaleHeight(PLATFORM_HEIGHT),
+      width: this.gameState.scaleX(PLATFORM_WIDTH),
+      height: this.gameState.scaleY(PLATFORM_HEIGHT),
       yOffset: -6,
       xOffset: 5,
     };

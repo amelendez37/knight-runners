@@ -46,11 +46,11 @@ export class GameState {
     return this.screenRightEdge;
   }
 
-  scaleWidth(width: number) {
+  scaleX(width: number) {
     return this.getScreenWidth() * width;
   }
 
-  scaleHeight(height: number) {
+  scaleY(height: number) {
     return this.getScreenHeight() * height;
   }
 

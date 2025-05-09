@@ -12,7 +12,7 @@ function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
 function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   gameState.clearGameState();
 
-  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleHeight(.04)) };
+  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleY(.04)) };
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
@@ -32,10 +32,10 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   gameState.addPlatformObject(startingPlatform);
 
   // rest of platforms that spawn in the game. These platforms are reused throughout session for efficiency
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
-    const platform = new Platform(lastPlatform.loc.x + gameState.scaleWidth(.2), lastPlatform.loc.y - gameState.scaleHeight(.2), ctx, gameState);
+    const platform = new Platform(lastPlatform.loc.x + gameState.scaleX(.2), lastPlatform.loc.y - gameState.scaleY(.2), ctx, gameState);
     gameState.addPlatformObject(platform);
   }
 }
