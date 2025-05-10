@@ -40,6 +40,7 @@ export class BaseObject {
   ctx: CanvasRenderingContext2D;
   gameState: GameState;
 
+  // used to calculate speed based on time between frames
   lastRenderTimestamp = 0;
 
   // constants
@@ -83,12 +84,12 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    this.ctx.strokeRect(
-      this.getLeftBound(),
-      this.getTopBound(),
-      this.hitbox.width,
-      this.hitbox.height
-    );
+    // this.ctx.strokeRect(
+    //   this.getLeftBound(),
+    //   this.getTopBound(),
+    //   this.hitbox.width,
+    //   this.hitbox.height
+    // );
     this.ctx.drawImage(this.sprite.img, this.loc.x, this.loc.y, this.sprite.width, this.sprite.height);
   }
 }

@@ -10,3 +10,5 @@ export const PLAYER_ASSET_HEIGHT = .10;
 export const PLATFORM_HEIGHT = .02;
 export const PLATFORM_WIDTH = .071;
 export const COLLISION_OFFSET = .001; // gives a little grace for player's colliding with objects
+export const PLATFORM_ASSET_HEIGHT = .1;
+export const PLATFORM_ASSET_WIDTH = .05;
