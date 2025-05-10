@@ -45,7 +45,7 @@ export class BaseObject {
   // constants
   HORIZONTAL_VELOCITY_DEFAULT = .15;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  GRAVITY_DEFAULT = .4;
+  GRAVITY_DEFAULT = .42;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
@@ -96,7 +96,7 @@ export class BaseObject {
 export class Player extends BaseObject {
   jumpVelocity: number;
 
-  JUMP_VELOCITY = .85;
+  JUMP_VELOCITY = 1.2;
 
   constructor(
     x: number,
@@ -147,7 +147,6 @@ export class Player extends BaseObject {
         this.getLeftBound() <= platform.getRightBound() - COLLISION_OFFSET &&
         this.getBottomBound() >= platform.getTopBound() &&
         this.getBottomBound() <= platform.getBottomBound();
-      // only have bottom collision be false if we KNOW that every single platform has returned false
       if (playerBottomCollision) {
         this.gravity = 0;
         // snap player to ground level they're colliding with in case of late collision detection
@@ -155,11 +154,11 @@ export class Player extends BaseObject {
         this.hitbox.isOnGround = true;
         return;
       }
-      // todo: figure out why gravity is never set after jump
+
+      noBottomCollisionCount += 1;
       if (noBottomCollisionCount === this.gameState.getPlatformObjectsOnScreen().length) {
         this.gravity = this.gameState.scaleY(this.GRAVITY_DEFAULT);
       }
-      noBottomCollisionCount += 1;
       this.hitbox.isOnGround = false;
     }
   }
@@ -187,9 +186,10 @@ export class Player extends BaseObject {
       (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
     if (this.verticalVelocity > 0) {
       if (oldY < this.loc.y) {
-        this.verticalVelocity -= this.gravity * 2 * this.SPEED_CONSTANT * delta;
+        // TODO: remove integer constants?
+        this.verticalVelocity -= this.gravity * 5 * this.SPEED_CONSTANT * delta;
       } else {
-        this.verticalVelocity -= this.gravity * this.SPEED_CONSTANT * delta;
+        this.verticalVelocity -= this.gravity * 3 * this.SPEED_CONSTANT * delta;
       }
     } else {
       this.verticalVelocity = 0;
