@@ -9,10 +9,21 @@ function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
   canvas.height = gameState.getScreenHeight();
 }
 
+function setupMenu(gameState: GameState, ctx: CanvasRenderingContext2D) {
+  const startButton = document.querySelector('.startButton');
+  startButton?.addEventListener('click', () => {
+    const menu = document.querySelector('.menu') as HTMLDivElement;
+    menu.classList.add('hide');
+
+    gameState.hasStarted = true;
+    gameLoop(gameState, ctx);
+  });
+}
+
 function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   gameState.clearGameState();
 
-  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleY(.04)) };
+  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleY(.08)) };
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
@@ -62,14 +73,12 @@ function run() {
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
   const gameState = new GameState();
+  setupMenu(gameState, ctx);
+  initObjects(gameState, ctx);
   setWindowSize(canvas, gameState);
   window.addEventListener('resize', function () {
     setWindowSize(canvas, gameState);
   });
-
-  initObjects(gameState, ctx);
-
-  gameLoop(gameState, ctx);
 }
 
 run();

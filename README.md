@@ -4,4 +4,4 @@
 2. yarn start
 
 ## todo
-1. figure out why platform assets aren't showing up
+1. 

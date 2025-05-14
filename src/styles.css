@@ -1,0 +1,23 @@
+.menu {
+    width: 100vw;
+    height: 100vh;
+    background-color: #172038;
+    z-index: 1000;
+    opacity: 0.33;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.startButton {
+    width: 15rem;
+    height: 5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #3c5e8b;
+}
+
+.hide {
+    display: none;
+}

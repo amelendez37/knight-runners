@@ -13,19 +13,24 @@
       padding: 0;
       overflow: hidden;
       /* Good for canvas-based games */
-      background: #fff;
+      /* background: #fff; */
       /* Black background for now */
-      color: #fff;
-      font-family: sans-serif;
+      /* color: #fff; */
+      /* font-family: sans-serif; */
     }
 
     canvas {
       display: block;
     }
   </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+  <div class="menu">
+    <button class="startButton">Start</button>
+  </div>
+
   <canvas id="gameCanvas"></canvas>
 
   <script src="./dist/bundle.js"></script>

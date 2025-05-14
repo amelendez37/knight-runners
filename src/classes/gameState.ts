@@ -6,6 +6,8 @@ export class GameState {
   screenBottomEdge: number;
   screenRightEdge: number;
 
+  hasStarted = false;
+
   constructor() {
     // need to re assign this on window resize
     this.screenBottomEdge = window.innerHeight;
