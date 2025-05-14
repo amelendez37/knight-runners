@@ -11,6 +11,7 @@ import {
   PLAYER_HITBOX_Y_OFFSET,
   PLATFORM_HITBOX_X_OFFSET,
   PLATFORM_HITBOX_Y_OFFSET,
+  PLATFORM_HORIZONTAL_VELOCITY_DEFAULT,
 } from '../constants';
 import { Location } from '../types';
 
@@ -86,12 +87,12 @@ export class BaseObject {
 
   draw() {
     // debug hitbox
-    // this.ctx.strokeRect(
-    //   this.getLeftBound(),
-    //   this.getTopBound(),
-    //   this.hitbox.width,
-    //   this.hitbox.height
-    // );
+    this.ctx.strokeRect(
+      this.getLeftBound(),
+      this.getTopBound(),
+      this.hitbox.width,
+      this.hitbox.height
+    );
     this.ctx.drawImage(this.sprite.img, this.loc.x, this.loc.y, this.sprite.width, this.sprite.height);
   }
 }
@@ -233,16 +234,29 @@ export class Platform extends BaseObject {
     gameState: GameState
   ) {
     super(x, y, ctx, gameState);
-    this.sprite.img.src = './assets/platform-min.png';
+    this.loc = { x, y };
+    // this.sprite.img.src = './assets/platform-min.png';
     this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
     this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
-    // this.movingLeft = true;
-    // this.horizontalVelocity = 2;
+    this.horizontalVelocity = this.gameState.scaleX(PLATFORM_HORIZONTAL_VELOCITY_DEFAULT);
+    this.movingLeft = true;
     this.hitbox = {
       width: this.gameState.scaleX(PLATFORM_WIDTH),
       height: this.gameState.scaleY(PLATFORM_HEIGHT),
       yOffset: this.gameState.scaleY(PLATFORM_HITBOX_Y_OFFSET),
       xOffset: this.gameState.scaleX(PLATFORM_HITBOX_X_OFFSET),
     };
+  }
+
+  static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
+    return [lastPlatform.loc.x + gameState.scaleX(.15), Platform.getRandomYLoc(lastPlatform.loc.y)];
+  }
+
+  static getRandomYLoc(origin: number) {
+    return this.gameState.scaleY(.2);
+  }
+
+  updateLocation() {
+    this.loc.x -= this.horizontalVelocity;
   }
 }

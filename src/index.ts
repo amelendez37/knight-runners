@@ -2,7 +2,6 @@ import { GameState } from './classes/gameState';
 import { Player, Platform } from './classes/gameObjects';
 import { PLAYER_HEIGHT, COLLISION_OFFSET } from './constants';
 
-
 function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
   gameState.setScreenDimensions(window.innerWidth, window.innerHeight);
   canvas.width = gameState.getScreenWidth();
@@ -12,11 +11,13 @@ function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
 function setupMenu(gameState: GameState, ctx: CanvasRenderingContext2D) {
   const startButton = document.querySelector('.startButton');
   startButton?.addEventListener('click', () => {
-    const menu = document.querySelector('.menu') as HTMLDivElement;
-    menu.classList.add('hide');
+    setTimeout(() => {
+      const menu = document.querySelector('.menu') as HTMLDivElement;
+      menu.classList.add('hide');
 
-    gameState.hasStarted = true;
-    gameLoop(gameState, ctx);
+      gameState.hasStarted = true;
+      gameLoop(gameState, ctx);
+    }, 3000);
   });
 }
 
@@ -43,10 +44,11 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   gameState.addPlatformObject(startingPlatform);
 
   // rest of platforms that spawn in the game. These platforms are reused throughout session for efficiency
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
-    const platform = new Platform(lastPlatform.loc.x + gameState.scaleX(.15), lastPlatform.loc.y - gameState.scaleY(.2), ctx, gameState);
+    const nextPlatformLoc = Platform.getNewPlatformLoc(lastPlatform, gameState);
+    const platform = new Platform(nextPlatformLoc[0], nextPlatformLoc[1], ctx, gameState);
     gameState.addPlatformObject(platform);
   }
 }
@@ -55,7 +57,7 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, gameState.getScreenWidth(), gameState.getScreenHeight());
 
   for (const platform of gameState.getPlatformObjects()) {
-    // platform.updateLocation();
+    platform.updateLocation();
     platform.draw();
   }
 
@@ -67,18 +69,21 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
   requestAnimationFrame(() => gameLoop(gameState, ctx));
 }
 
-function run() {
+async function run() {
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   // gives us methods to draw within our 2d canvas element
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
   const gameState = new GameState();
+
   setupMenu(gameState, ctx);
   initObjects(gameState, ctx);
   setWindowSize(canvas, gameState);
   window.addEventListener('resize', function () {
     setWindowSize(canvas, gameState);
   });
+
+  // todo: remove
+  gameLoop(gameState, ctx);
 }
 
 run();
