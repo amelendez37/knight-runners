@@ -249,11 +249,11 @@ export class Platform extends BaseObject {
   }
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
-    return [lastPlatform.loc.x + gameState.scaleX(.15), Platform.getRandomYLoc(lastPlatform.loc.y)];
+    return [lastPlatform.loc.x + gameState.scaleX(.15), Platform.getRandomYLoc(lastPlatform.loc.y, gameState)];
   }
 
-  static getRandomYLoc(origin: number) {
-    return this.gameState.scaleY(.2);
+  static getRandomYLoc(origin: number, gameState: GameState) {
+    return origin + gameState.scaleY(.2);
   }
 
   updateLocation() {
