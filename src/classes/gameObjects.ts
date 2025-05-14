@@ -9,6 +9,8 @@ import {
   COLLISION_OFFSET,
   PLAYER_HITBOX_X_OFFSET,
   PLAYER_HITBOX_Y_OFFSET,
+  PLATFORM_HITBOX_X_OFFSET,
+  PLATFORM_HITBOX_Y_OFFSET,
 } from '../constants';
 import { Location } from '../types';
 
@@ -232,13 +234,15 @@ export class Platform extends BaseObject {
   ) {
     super(x, y, ctx, gameState);
     this.sprite.img.src = './assets/platform-min.png';
+    this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
+    this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
     // this.movingLeft = true;
     // this.horizontalVelocity = 2;
     this.hitbox = {
       width: this.gameState.scaleX(PLATFORM_WIDTH),
       height: this.gameState.scaleY(PLATFORM_HEIGHT),
-      yOffset: -6,
-      xOffset: 5,
+      yOffset: this.gameState.scaleY(PLATFORM_HITBOX_Y_OFFSET),
+      xOffset: this.gameState.scaleX(PLATFORM_HITBOX_X_OFFSET),
     };
   }
 }

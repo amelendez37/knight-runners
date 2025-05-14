@@ -35,7 +35,7 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   for (let i = 0; i < 4; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
-    const platform = new Platform(lastPlatform.loc.x + gameState.scaleX(.2), lastPlatform.loc.y - gameState.scaleY(.2), ctx, gameState);
+    const platform = new Platform(lastPlatform.loc.x + gameState.scaleX(.15), lastPlatform.loc.y - gameState.scaleY(.2), ctx, gameState);
     gameState.addPlatformObject(platform);
   }
 }
