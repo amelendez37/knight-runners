@@ -279,10 +279,14 @@ export class Platform extends BaseObject {
       finalNextYPos = nextYPos;
     }
 
-    return [lastPlatform.loc.x + gameState.scaleX(0.15), finalNextYPos];
+    return [lastPlatform.loc.x + gameState.scaleX(0.25), finalNextYPos];
   }
 
   updateLocation() {
     this.loc.x -= this.horizontalVelocity;
+    if (this.loc.x < -this.hitbox.width) {
+      this.loc.x = this.gameState.getScreenWidth() + this.hitbox.width;
+      this.loc.y = Platform.getNewPlatformLoc(this, this.gameState)[1];
+    }
   }
 }
