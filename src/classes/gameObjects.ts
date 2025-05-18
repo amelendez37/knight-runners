@@ -14,6 +14,7 @@ import {
   PLATFORM_HORIZONTAL_VELOCITY_DEFAULT,
 } from '../constants';
 import { Location } from '../types';
+import { getRandomInRange } from '../utils';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -47,9 +48,9 @@ export class BaseObject {
   lastRenderTimestamp = 0;
 
   // constants
-  HORIZONTAL_VELOCITY_DEFAULT = .15;
+  HORIZONTAL_VELOCITY_DEFAULT = 0.15;
   VERTICAL_VELOCITY_DEFAULT = 0;
-  GRAVITY_DEFAULT = .42;
+  GRAVITY_DEFAULT = 0.42;
   SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
 
   constructor(
@@ -61,8 +62,10 @@ export class BaseObject {
     this.loc = { x, y };
     this.movingRight = false;
     this.movingLeft = false;
-    this.horizontalVelocity = gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
-    this.verticalVelocity = gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
+    this.horizontalVelocity =
+      gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
+    this.verticalVelocity =
+      gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
     this.gravity = gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
     this.sprite = { img: new Image(), width: 0, height: 0 };
     this.ctx = ctx;
@@ -93,7 +96,13 @@ export class BaseObject {
       this.hitbox.width,
       this.hitbox.height
     );
-    this.ctx.drawImage(this.sprite.img, this.loc.x, this.loc.y, this.sprite.width, this.sprite.height);
+    this.ctx.drawImage(
+      this.sprite.img,
+      this.loc.x,
+      this.loc.y,
+      this.sprite.width,
+      this.sprite.height
+    );
   }
 }
 
@@ -143,7 +152,9 @@ export class Player extends BaseObject {
       if (playerLeftSideCollision || playerRightSideCollision) {
         this.horizontalVelocity = 0;
       } else {
-        this.horizontalVelocity = this.gameState.scaleX(this.HORIZONTAL_VELOCITY_DEFAULT);
+        this.horizontalVelocity = this.gameState.scaleX(
+          this.HORIZONTAL_VELOCITY_DEFAULT
+        );
       }
 
       const playerBottomCollision =
@@ -154,13 +165,17 @@ export class Player extends BaseObject {
       if (playerBottomCollision) {
         this.gravity = 0;
         // snap player to ground level they're colliding with in case of late collision detection
-        this.loc.y = platform.getTopBound() - (this.hitbox.height + this.hitbox.yOffset);
+        this.loc.y =
+          platform.getTopBound() - (this.hitbox.height + this.hitbox.yOffset);
         this.hitbox.isOnGround = true;
         return;
       }
 
       noBottomCollisionCount += 1;
-      if (noBottomCollisionCount === this.gameState.getPlatformObjectsOnScreen().length) {
+      if (
+        noBottomCollisionCount ===
+        this.gameState.getPlatformObjectsOnScreen().length
+      ) {
         this.gravity = this.gameState.scaleY(this.GRAVITY_DEFAULT);
       }
       this.hitbox.isOnGround = false;
@@ -238,7 +253,9 @@ export class Platform extends BaseObject {
     // this.sprite.img.src = './assets/platform-min.png';
     this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
     this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
-    this.horizontalVelocity = this.gameState.scaleX(PLATFORM_HORIZONTAL_VELOCITY_DEFAULT);
+    this.horizontalVelocity = this.gameState.scaleX(
+      PLATFORM_HORIZONTAL_VELOCITY_DEFAULT
+    );
     this.movingLeft = true;
     this.hitbox = {
       width: this.gameState.scaleX(PLATFORM_WIDTH),
@@ -249,11 +266,20 @@ export class Platform extends BaseObject {
   }
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
-    return [lastPlatform.loc.x + gameState.scaleX(.15), Platform.getRandomYLoc(lastPlatform.loc.y, gameState)];
-  }
+    // max amount of y distance we can have the next platform
+    const maxDelta = gameState.scaleY(0.2);
+    const nextDelta = getRandomInRange(-maxDelta, maxDelta);
+    const nextYPos = lastPlatform.loc.y + nextDelta;
+    let finalNextYPos;
+    if (nextYPos > gameState.getScreenHeight() - lastPlatform.hitbox.height) {
+      finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height;
+    } else if (nextYPos < 0) {
+      finalNextYPos = PLAYER_HEIGHT;
+    } else {
+      finalNextYPos = nextYPos;
+    }
 
-  static getRandomYLoc(origin: number, gameState: GameState) {
-    return origin + gameState.scaleY(.2);
+    return [lastPlatform.loc.x + gameState.scaleX(0.15), finalNextYPos];
   }
 
   updateLocation() {

@@ -24,11 +24,16 @@ function setupMenu(gameState: GameState, ctx: CanvasRenderingContext2D) {
 function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   gameState.clearGameState();
 
-  const STARTING_PLATFORM_LOC = { x: 0, y: gameState.getScreenHeight() - (gameState.scaleY(.08)) };
+  const STARTING_PLATFORM_LOC = {
+    x: 0,
+    y: gameState.getScreenHeight() / 2,
+  };
 
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
-    STARTING_PLATFORM_LOC.y - (PLAYER_HEIGHT * gameState.getScreenHeight()) + COLLISION_OFFSET,
+    STARTING_PLATFORM_LOC.y -
+      PLAYER_HEIGHT * gameState.getScreenHeight() +
+      COLLISION_OFFSET,
     ctx,
     gameState
   );
@@ -48,7 +53,12 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
     const nextPlatformLoc = Platform.getNewPlatformLoc(lastPlatform, gameState);
-    const platform = new Platform(nextPlatformLoc[0], nextPlatformLoc[1], ctx, gameState);
+    const platform = new Platform(
+      nextPlatformLoc[0],
+      nextPlatformLoc[1],
+      ctx,
+      gameState
+    );
     gameState.addPlatformObject(platform);
   }
 }
