@@ -274,7 +274,7 @@ export class Platform extends BaseObject {
     if (nextYPos > gameState.getScreenHeight() - lastPlatform.hitbox.height) {
       finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height;
     } else if (nextYPos < 0) {
-      finalNextYPos = PLAYER_HEIGHT;
+      finalNextYPos = gameState.scaleY(PLAYER_HEIGHT);
     } else {
       finalNextYPos = nextYPos;
     }
