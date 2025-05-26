@@ -275,7 +275,8 @@ export class Platform extends BaseObject {
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
     // max amount of y distance we can have the next platform
-    const NEXT_PLATFORM_Y_OFFSET = gameState.scaleY(0.09);
+    const NEXT_PLATFORM_Y_OFFSET = gameState.scaleY(0.25);
+    const playerHeight = gameState.scaleY(PLAYER_HEIGHT);
     const spawnAbove = Math.random() < 0.5;
     let nextYPos;
     if (spawnAbove) {
@@ -284,14 +285,17 @@ export class Platform extends BaseObject {
       nextYPos = lastPlatform.loc.y - NEXT_PLATFORM_Y_OFFSET;
     }
 
-    // let finalNextYPos;
-    // if (nextYPos > gameState.getScreenHeight()) {
-    //   finalNextYPos = nextYPos - gameState.scaleY(PLAYER_HEIGHT);
-    // } else if (nextYPos < 0) {
-    //   finalNextYPos = nextYPos + gameState.scaleY(PLAYER_HEIGHT);
-    // } else {
-    //   finalNextYPos = nextYPos;
-    // }
+    let finalNextYPos;
+    // too low
+    if (nextYPos > gameState.getScreenHeight() - lastPlatform.hitbox.height) {
+      finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height;
+      // too high
+    } else if (nextYPos <= playerHeight * 2) {
+      finalNextYPos = playerHeight;
+      // okay
+    } else {
+      finalNextYPos = nextYPos;
+    }
 
     // if (nextYPos > lastPlatform.loc.y) {
     //   nextYPos += NEXT_PLATFORM_Y_OFFSET;
@@ -301,7 +305,7 @@ export class Platform extends BaseObject {
 
     return [
       lastPlatform.loc.x + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
-      nextYPos,
+      finalNextYPos,
     ];
   }
 
@@ -313,10 +317,15 @@ export class Platform extends BaseObject {
         this.index - 1 < 0
           ? this.gameState.getPlatformObjects().length - 1
           : this.index - 1;
+      const rightMostPlatform =
+        this.gameState.getPlatformObjects()[indexForRightMostPlatform];
       this.loc.x =
-        this.gameState.getPlatformObjects()[indexForRightMostPlatform].loc.x +
+        rightMostPlatform.loc.x +
         this.gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE);
-      this.loc.y = Platform.getNewPlatformLoc(this, this.gameState)[1];
+      this.loc.y = Platform.getNewPlatformLoc(
+        rightMostPlatform,
+        this.gameState
+      )[1];
     }
   }
 }
