@@ -205,9 +205,11 @@ export class Player extends BaseObject {
       (this.gravity - this.verticalVelocity) * this.SPEED_CONSTANT * delta;
     if (this.verticalVelocity > 0) {
       if (oldY < this.loc.y) {
-        // TODO: remove integer constants?
-        this.verticalVelocity -= this.gravity * 5 * this.SPEED_CONSTANT * delta;
+        // we're falling so make player drop faster
+        this.verticalVelocity -=
+          this.gravity * 100 * this.SPEED_CONSTANT * delta;
       } else {
+        // we're moving up but decelerating
         this.verticalVelocity -= this.gravity * 3 * this.SPEED_CONSTANT * delta;
       }
     } else {
@@ -242,14 +244,20 @@ export class Player extends BaseObject {
 }
 
 export class Platform extends BaseObject {
+  index: number;
+
+  static PLATFORM_X_SPAWN_DISTANCE = 0.25;
+
   constructor(
     x: number,
     y: number,
+    index: number,
     ctx: CanvasRenderingContext2D,
     gameState: GameState
   ) {
     super(x, y, ctx, gameState);
     this.loc = { x, y };
+    this.index = index;
     // this.sprite.img.src = './assets/platform-min.png';
     this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
     this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
@@ -267,25 +275,47 @@ export class Platform extends BaseObject {
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
     // max amount of y distance we can have the next platform
-    const maxDelta = gameState.scaleY(0.2);
-    const nextDelta = getRandomInRange(-maxDelta, maxDelta);
-    const nextYPos = lastPlatform.loc.y + nextDelta;
-    let finalNextYPos;
-    if (nextYPos > gameState.getScreenHeight() - lastPlatform.hitbox.height) {
-      finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height;
-    } else if (nextYPos < 0) {
-      finalNextYPos = gameState.scaleY(PLAYER_HEIGHT);
+    const NEXT_PLATFORM_Y_OFFSET = gameState.scaleY(0.09);
+    const spawnAbove = Math.random() < 0.5;
+    let nextYPos;
+    if (spawnAbove) {
+      nextYPos = lastPlatform.loc.y + NEXT_PLATFORM_Y_OFFSET;
     } else {
-      finalNextYPos = nextYPos;
+      nextYPos = lastPlatform.loc.y - NEXT_PLATFORM_Y_OFFSET;
     }
 
-    return [lastPlatform.loc.x + gameState.scaleX(0.25), finalNextYPos];
+    // let finalNextYPos;
+    // if (nextYPos > gameState.getScreenHeight()) {
+    //   finalNextYPos = nextYPos - gameState.scaleY(PLAYER_HEIGHT);
+    // } else if (nextYPos < 0) {
+    //   finalNextYPos = nextYPos + gameState.scaleY(PLAYER_HEIGHT);
+    // } else {
+    //   finalNextYPos = nextYPos;
+    // }
+
+    // if (nextYPos > lastPlatform.loc.y) {
+    //   nextYPos += NEXT_PLATFORM_Y_OFFSET;
+    // } else {
+    //   nextYPos -= NEXT_PLATFORM_Y_OFFSET;
+    // }
+
+    return [
+      lastPlatform.loc.x + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
+      nextYPos,
+    ];
   }
 
   updateLocation() {
     this.loc.x -= this.horizontalVelocity;
+
     if (this.loc.x < -this.hitbox.width) {
-      this.loc.x = this.gameState.getScreenWidth() + this.hitbox.width;
+      const indexForRightMostPlatform =
+        this.index - 1 < 0
+          ? this.gameState.getPlatformObjects().length - 1
+          : this.index - 1;
+      this.loc.x =
+        this.gameState.getPlatformObjects()[indexForRightMostPlatform].loc.x +
+        this.gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE);
       this.loc.y = Platform.getNewPlatformLoc(this, this.gameState)[1];
     }
   }

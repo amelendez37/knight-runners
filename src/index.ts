@@ -43,6 +43,7 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   const startingPlatform = new Platform(
     STARTING_PLATFORM_LOC.x,
     STARTING_PLATFORM_LOC.y,
+    gameState.getPlatformObjects().length,
     ctx,
     gameState
   );
@@ -56,6 +57,7 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
     const platform = new Platform(
       nextPlatformLoc[0],
       nextPlatformLoc[1],
+      gameState.getPlatformObjects().length,
       ctx,
       gameState
     );
