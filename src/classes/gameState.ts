@@ -23,7 +23,7 @@ export class GameState {
   }
 
   getPlatformObjectsOnScreen() {
-    // todo: return just the platforms that exist on screen for optimization, may need to separate platforms even further into sections
+    // todo: return just the platforms that exist on screen for optimization, may need to separate platforms even further into sections?
     return this.getPlatformObjects();
   }
 
