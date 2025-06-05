@@ -243,6 +243,7 @@ export class Player extends BaseObject {
 
 export class Platform extends BaseObject {
   index: number;
+  isStarter: boolean;
 
   static PLATFORM_X_SPAWN_DISTANCE = 0.25;
 
@@ -251,7 +252,8 @@ export class Platform extends BaseObject {
     y: number,
     index: number,
     ctx: CanvasRenderingContext2D,
-    gameState: GameState
+    gameState: GameState,
+    isStarter = false,
   ) {
     super(x, y, ctx, gameState);
     this.loc = { x, y };
@@ -264,12 +266,17 @@ export class Platform extends BaseObject {
       this.HORIZONTAL_VELOCITY_DEFAULT
     );
     this.movingLeft = true;
+
+    // make starting platform width wider than others
+    let widthMultiplier = 1;
+    if (isStarter) widthMultiplier = 5;
     this.hitbox = {
-      width: this.gameState.scaleX(PLATFORM_WIDTH),
+      width: this.gameState.scaleX(PLATFORM_WIDTH) * widthMultiplier,
       height: this.gameState.scaleY(PLATFORM_HEIGHT),
       yOffset: this.gameState.scaleY(PLATFORM_HITBOX_Y_OFFSET),
       xOffset: this.gameState.scaleX(PLATFORM_HITBOX_X_OFFSET),
     };
+    this.isStarter = isStarter;
   }
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
