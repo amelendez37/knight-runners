@@ -11,10 +11,8 @@ import {
   PLAYER_HITBOX_Y_OFFSET,
   PLATFORM_HITBOX_X_OFFSET,
   PLATFORM_HITBOX_Y_OFFSET,
-  PLATFORM_HORIZONTAL_VELOCITY_DEFAULT,
 } from '../constants';
 import { Location } from '../types';
-import { getRandomInRange } from '../utils';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -261,8 +259,9 @@ export class Platform extends BaseObject {
     // this.sprite.img.src = './assets/platform-min.png';
     this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
     this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
+    this.HORIZONTAL_VELOCITY_DEFAULT = .14;
     this.horizontalVelocity = this.gameState.scaleX(
-      PLATFORM_HORIZONTAL_VELOCITY_DEFAULT
+      this.HORIZONTAL_VELOCITY_DEFAULT
     );
     this.movingLeft = true;
     this.hitbox = {
@@ -310,7 +309,14 @@ export class Platform extends BaseObject {
   }
 
   updateLocation() {
-    this.loc.x -= this.horizontalVelocity;
+    const now = Date.now() / 1000; // current timestamp in seconds
+    if (!this.lastRenderTimestamp) {
+      this.lastRenderTimestamp = now;
+    }
+    const delta = now - this.lastRenderTimestamp;
+    this.lastRenderTimestamp = now;
+
+    this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
 
     if (this.loc.x < -this.hitbox.width) {
       const indexForRightMostPlatform =
