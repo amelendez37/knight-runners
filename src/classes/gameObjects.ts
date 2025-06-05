@@ -326,6 +326,10 @@ export class Platform extends BaseObject {
     this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
 
     if (this.loc.x < -this.hitbox.width) {
+      if (this.isStarter) {
+        this.gameState.deletePlatformObject(this);
+      }
+
       const indexForRightMostPlatform =
         this.index - 1 < 0
           ? this.gameState.getPlatformObjects().length - 1
