@@ -243,9 +243,8 @@ export class Player extends BaseObject {
 
 export class Platform extends BaseObject {
   index: number;
-  isStarter: boolean;
 
-  static PLATFORM_X_SPAWN_DISTANCE = 0.25;
+  static PLATFORM_X_SPAWN_DISTANCE = 0.15;
 
   constructor(
     x: number,
@@ -253,7 +252,7 @@ export class Platform extends BaseObject {
     index: number,
     ctx: CanvasRenderingContext2D,
     gameState: GameState,
-    isStarter = false,
+    widthMultiplier = 1,
   ) {
     super(x, y, ctx, gameState);
     this.loc = { x, y };
@@ -267,16 +266,12 @@ export class Platform extends BaseObject {
     );
     this.movingLeft = true;
 
-    // make starting platform width wider than others
-    let widthMultiplier = 1;
-    if (isStarter) widthMultiplier = 5;
     this.hitbox = {
       width: this.gameState.scaleX(PLATFORM_WIDTH) * widthMultiplier,
       height: this.gameState.scaleY(PLATFORM_HEIGHT),
       yOffset: this.gameState.scaleY(PLATFORM_HITBOX_Y_OFFSET),
       xOffset: this.gameState.scaleX(PLATFORM_HITBOX_X_OFFSET),
     };
-    this.isStarter = isStarter;
   }
 
   static getNewPlatformLoc(lastPlatform: Platform, gameState: GameState) {
@@ -310,7 +305,7 @@ export class Platform extends BaseObject {
     // }
 
     return [
-      lastPlatform.loc.x + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
+      lastPlatform.loc.x + lastPlatform.hitbox.width + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
       finalNextYPos,
     ];
   }
@@ -326,10 +321,6 @@ export class Platform extends BaseObject {
     this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
 
     if (this.loc.x < -this.hitbox.width) {
-      if (this.isStarter) {
-        this.gameState.deletePlatformObject(this);
-      }
-
       const indexForRightMostPlatform =
         this.index - 1 < 0
           ? this.gameState.getPlatformObjects().length - 1
@@ -337,7 +328,7 @@ export class Platform extends BaseObject {
       const rightMostPlatform =
         this.gameState.getPlatformObjects()[indexForRightMostPlatform];
       this.loc.x =
-        rightMostPlatform.loc.x +
+        rightMostPlatform.loc.x + rightMostPlatform.hitbox.width +
         this.gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE);
       this.loc.y = Platform.getNewPlatformLoc(
         rightMostPlatform,

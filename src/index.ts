@@ -46,12 +46,12 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
     gameState.getPlatformObjects().length,
     ctx,
     gameState,
-    true,
+    3,
   );
   gameState.addPlatformObject(startingPlatform);
 
   // rest of platforms that spawn in the game. These platforms are reused throughout session for efficiency
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const currPlatforms = gameState.getPlatformObjects();
     const lastPlatform = currPlatforms[currPlatforms.length - 1];
     const nextPlatformLoc = Platform.getNewPlatformLoc(lastPlatform, gameState);
