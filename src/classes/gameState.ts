@@ -7,11 +7,19 @@ export class GameState {
   screenRightEdge: number;
 
   hasStarted = false;
+  paused = true;
 
   constructor() {
     // need to re assign this on window resize
     this.screenBottomEdge = window.innerHeight;
     this.screenRightEdge = window.innerWidth;
+  }
+
+  startGame(gameState: GameState, gameLoop: Function) {
+    const menu = document.querySelector('.menu');
+    menu?.classList.add('hide');
+    gameState.paused = false;
+    gameLoop();
   }
 
   getPlayerObjects() {
