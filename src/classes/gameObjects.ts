@@ -295,7 +295,7 @@ export class Platform extends BaseObject {
       // too high
     } else if (nextYPos <= playerHeight * 2) {
       finalNextYPos = playerHeight;
-      // okay
+      // just right
     } else {
       finalNextYPos = nextYPos;
     }

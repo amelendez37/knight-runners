@@ -12,13 +12,7 @@ function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
 function setupMenu(gameState: GameState, ctx: CanvasRenderingContext2D) {
   const startButton = document.querySelector('.startButton');
   startButton?.addEventListener('click', () => {
-    setTimeout(() => {
-      const menu = document.querySelector('.menu') as HTMLDivElement;
-      menu.classList.add('hide');
-
-      gameState.hasStarted = true;
-      gameLoop(gameState, ctx);
-    }, 3000);
+    gameState.startGame(gameState, () => gameLoop(gameState, ctx));
   });
 }
 
@@ -81,7 +75,9 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
     player.draw();
   }
 
-  requestAnimationFrame(() => gameLoop(gameState, ctx));
+  if (!gameState.paused) {
+    requestAnimationFrame(() => gameLoop(gameState, ctx));
+  }
 }
 
 async function run() {
@@ -92,6 +88,8 @@ async function run() {
 
   setupMenu(gameState, ctx);
   initObjects(gameState, ctx);
+  // initial draw when game is still paused
+  // gameLoop(gameState, ctx);
   setWindowSize(canvas, gameState);
   window.addEventListener('resize', function () {
     setWindowSize(canvas, gameState);
