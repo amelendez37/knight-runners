@@ -1,6 +1,7 @@
 import { GameState } from './classes/gameState';
 import { Player, Platform } from './classes/gameObjects';
 import { PLAYER_HEIGHT, COLLISION_OFFSET } from './constants';
+import { getRandomFromArray } from './utils';
 
 function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
   gameState.setScreenDimensions(window.innerWidth, window.innerHeight);
@@ -32,8 +33,8 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
   const player = new Player(
     STARTING_PLATFORM_LOC.x,
     STARTING_PLATFORM_LOC.y -
-      PLAYER_HEIGHT * gameState.getScreenHeight() +
-      COLLISION_OFFSET,
+    PLAYER_HEIGHT * gameState.getScreenHeight() +
+    COLLISION_OFFSET,
     ctx,
     gameState
   );
@@ -45,7 +46,8 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
     STARTING_PLATFORM_LOC.y,
     gameState.getPlatformObjects().length,
     ctx,
-    gameState
+    gameState,
+    Platform.WIDTH_MULTIPLIERS[Platform.WIDTH_MULTIPLIERS.length - 1],
   );
   gameState.addPlatformObject(startingPlatform);
 
@@ -59,7 +61,8 @@ function initObjects(gameState: GameState, ctx: CanvasRenderingContext2D) {
       nextPlatformLoc[1],
       gameState.getPlatformObjects().length,
       ctx,
-      gameState
+      gameState,
+      getRandomFromArray(Platform.WIDTH_MULTIPLIERS),
     );
     gameState.addPlatformObject(platform);
   }

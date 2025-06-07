@@ -13,6 +13,7 @@ import {
   PLATFORM_HITBOX_Y_OFFSET,
 } from '../constants';
 import { Location } from '../types';
+import { getRandomFromArray } from '../utils';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -49,7 +50,7 @@ export class BaseObject {
   HORIZONTAL_VELOCITY_DEFAULT = 0.15;
   VERTICAL_VELOCITY_DEFAULT = 0;
   GRAVITY_DEFAULT = 0.42;
-  SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
+  SPEED_CONSTANT = 2; // for tweaking speed of all objects
 
   constructor(
     x: number,
@@ -244,14 +245,16 @@ export class Player extends BaseObject {
 export class Platform extends BaseObject {
   index: number;
 
-  static PLATFORM_X_SPAWN_DISTANCE = 0.25;
+  static PLATFORM_X_SPAWN_DISTANCE = 0.15;
+  static WIDTH_MULTIPLIERS = [.5, 1, 1.25, 1.5, 2, 3];
 
   constructor(
     x: number,
     y: number,
     index: number,
     ctx: CanvasRenderingContext2D,
-    gameState: GameState
+    gameState: GameState,
+    widthMultiplier = 1,
   ) {
     super(x, y, ctx, gameState);
     this.loc = { x, y };
@@ -264,8 +267,9 @@ export class Platform extends BaseObject {
       this.HORIZONTAL_VELOCITY_DEFAULT
     );
     this.movingLeft = true;
+
     this.hitbox = {
-      width: this.gameState.scaleX(PLATFORM_WIDTH),
+      width: this.gameState.scaleX(PLATFORM_WIDTH) * widthMultiplier,
       height: this.gameState.scaleY(PLATFORM_HEIGHT),
       yOffset: this.gameState.scaleY(PLATFORM_HITBOX_Y_OFFSET),
       xOffset: this.gameState.scaleX(PLATFORM_HITBOX_X_OFFSET),
@@ -287,7 +291,7 @@ export class Platform extends BaseObject {
     let finalNextYPos;
     // too low
     if (nextYPos > gameState.getScreenHeight() - lastPlatform.hitbox.height) {
-      finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height;
+      finalNextYPos = gameState.getScreenHeight() - lastPlatform.hitbox.height + playerHeight;
       // too high
     } else if (nextYPos <= playerHeight * 2) {
       finalNextYPos = playerHeight;
@@ -296,14 +300,8 @@ export class Platform extends BaseObject {
       finalNextYPos = nextYPos;
     }
 
-    // if (nextYPos > lastPlatform.loc.y) {
-    //   nextYPos += NEXT_PLATFORM_Y_OFFSET;
-    // } else {
-    //   nextYPos -= NEXT_PLATFORM_Y_OFFSET;
-    // }
-
     return [
-      lastPlatform.loc.x + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
+      lastPlatform.loc.x + lastPlatform.hitbox.width + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
       finalNextYPos,
     ];
   }
@@ -326,12 +324,13 @@ export class Platform extends BaseObject {
       const rightMostPlatform =
         this.gameState.getPlatformObjects()[indexForRightMostPlatform];
       this.loc.x =
-        rightMostPlatform.loc.x +
+        rightMostPlatform.loc.x + rightMostPlatform.hitbox.width +
         this.gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE);
       this.loc.y = Platform.getNewPlatformLoc(
         rightMostPlatform,
         this.gameState
       )[1];
+      this.hitbox.width = this.gameState.scaleX(PLATFORM_WIDTH) * getRandomFromArray(Platform.WIDTH_MULTIPLIERS);
     }
   }
 }

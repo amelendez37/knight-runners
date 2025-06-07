@@ -31,6 +31,14 @@ export class GameState {
     this.#platformOjects.push(platformOject);
   }
 
+  deletePlatformObject(platformOject: Platform) {
+    for (let i = 0; i < this.#platformOjects.length; i++) {
+      if (this.#platformOjects[i] === platformOject) {
+        this.#platformOjects.splice(i, 1);
+      }
+    }
+  }
+
   addPlayerObject(playerObject: Player) {
     this.#playerOjects.push(playerObject);
   }
