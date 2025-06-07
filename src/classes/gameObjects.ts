@@ -13,6 +13,7 @@ import {
   PLATFORM_HITBOX_Y_OFFSET,
 } from '../constants';
 import { Location } from '../types';
+import { getRandomFromArray } from '../utils';
 
 export type GameObjectType = BaseObject | Player;
 
@@ -245,6 +246,7 @@ export class Platform extends BaseObject {
   index: number;
 
   static PLATFORM_X_SPAWN_DISTANCE = 0.15;
+  static WIDTH_MULTIPLIERS = [.5, 1, 1.5, 2, 2.5, 3];
 
   constructor(
     x: number,
@@ -334,6 +336,7 @@ export class Platform extends BaseObject {
         rightMostPlatform,
         this.gameState
       )[1];
+      this.hitbox.width = this.gameState.scaleX(PLATFORM_WIDTH) * getRandomFromArray(Platform.WIDTH_MULTIPLIERS);
     }
   }
 }
