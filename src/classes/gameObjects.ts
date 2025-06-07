@@ -50,7 +50,7 @@ export class BaseObject {
   HORIZONTAL_VELOCITY_DEFAULT = 0.15;
   VERTICAL_VELOCITY_DEFAULT = 0;
   GRAVITY_DEFAULT = 0.42;
-  SPEED_CONSTANT = 1.5; // for tweaking speed of all objects
+  SPEED_CONSTANT = 2; // for tweaking speed of all objects
 
   constructor(
     x: number,
@@ -246,7 +246,7 @@ export class Platform extends BaseObject {
   index: number;
 
   static PLATFORM_X_SPAWN_DISTANCE = 0.15;
-  static WIDTH_MULTIPLIERS = [.5, 1, 1.5, 2, 2.5, 3];
+  static WIDTH_MULTIPLIERS = [.5, 1, 1.25, 1.5, 2, 3];
 
   constructor(
     x: number,
@@ -299,12 +299,6 @@ export class Platform extends BaseObject {
     } else {
       finalNextYPos = nextYPos;
     }
-
-    // if (nextYPos > lastPlatform.loc.y) {
-    //   nextYPos += NEXT_PLATFORM_Y_OFFSET;
-    // } else {
-    //   nextYPos -= NEXT_PLATFORM_Y_OFFSET;
-    // }
 
     return [
       lastPlatform.loc.x + lastPlatform.hitbox.width + gameState.scaleX(Platform.PLATFORM_X_SPAWN_DISTANCE),
