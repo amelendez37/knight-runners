@@ -75,9 +75,7 @@ function gameLoop(gameState: GameState, ctx: CanvasRenderingContext2D) {
     player.draw();
   }
 
-  if (!gameState.paused) {
-    requestAnimationFrame(() => gameLoop(gameState, ctx));
-  }
+  requestAnimationFrame(() => gameLoop(gameState, ctx));
 }
 
 async function run() {
@@ -88,14 +86,11 @@ async function run() {
 
   setupMenu(gameState, ctx);
   initObjects(gameState, ctx);
-  // initial draw when game is still paused
-  // gameLoop(gameState, ctx);
   setWindowSize(canvas, gameState);
   window.addEventListener('resize', function () {
     setWindowSize(canvas, gameState);
   });
 
-  // todo: remove
   gameLoop(gameState, ctx);
 }
 

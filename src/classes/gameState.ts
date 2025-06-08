@@ -18,8 +18,29 @@ export class GameState {
   startGame(gameState: GameState, gameLoop: Function) {
     const menu = document.querySelector('.menu');
     menu?.classList.add('hide');
-    gameState.paused = false;
-    gameLoop();
+    this.runCountdown().then((intervalId) => {
+      clearInterval(intervalId as number);
+      gameState.paused = false;
+      gameLoop();
+    });
+  }
+
+  async runCountdown() {
+    const timer = document.querySelector('.timer') as HTMLParagraphElement;
+    timer.classList.remove('hide');
+
+    return new Promise((res) => {
+      let count = 3;
+
+      const intervalId = setInterval(() => {
+        count -= 1;
+        timer.innerHTML = count.toString();
+        if (count == 0) {
+          timer.classList.add('hide');
+          res(intervalId);
+        }
+      }, 1000);
+    });
   }
 
   getPlayerObjects() {
