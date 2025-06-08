@@ -6,7 +6,7 @@
     width: 25rem;
     height: 30rem;
     z-index: 1000;
-    background: linear-gradient(to bottom, #577277, #172038);
+    /* background: linear-gradient(to bottom, #577277, #172038); */
 
     display: flex;
     justify-content: center;
@@ -21,7 +21,7 @@
     background: transparent;
     border: none;
     font-size: 6rem;
-    color: white;
+    color: black;
     cursor: pointer;
 }
 
