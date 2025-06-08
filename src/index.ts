@@ -12,13 +12,7 @@ function setWindowSize(canvas: HTMLCanvasElement, gameState: GameState) {
 function setupMenu(gameState: GameState, ctx: CanvasRenderingContext2D) {
   const startButton = document.querySelector('.startButton');
   startButton?.addEventListener('click', () => {
-    setTimeout(() => {
-      const menu = document.querySelector('.menu') as HTMLDivElement;
-      menu.classList.add('hide');
-
-      gameState.hasStarted = true;
-      gameLoop(gameState, ctx);
-    }, 3000);
+    gameState.startGame(gameState, () => gameLoop(gameState, ctx));
   });
 }
 
@@ -97,7 +91,6 @@ async function run() {
     setWindowSize(canvas, gameState);
   });
 
-  // todo: remove
   gameLoop(gameState, ctx);
 }
 

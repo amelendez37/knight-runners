@@ -182,6 +182,8 @@ export class Player extends BaseObject {
   }
 
   updateLocation() {
+    if (this.gameState.paused) return;
+
     this.checkCollisions();
     // movement is updated based on time not renders so that
     // velocity does not change relative to fps
@@ -295,7 +297,7 @@ export class Platform extends BaseObject {
       // too high
     } else if (nextYPos <= playerHeight * 2) {
       finalNextYPos = playerHeight;
-      // okay
+      // just right
     } else {
       finalNextYPos = nextYPos;
     }
@@ -307,6 +309,8 @@ export class Platform extends BaseObject {
   }
 
   updateLocation() {
+    if (this.gameState.paused) return;
+
     const now = Date.now() / 1000; // current timestamp in seconds
     if (!this.lastRenderTimestamp) {
       this.lastRenderTimestamp = now;
