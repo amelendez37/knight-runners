@@ -338,3 +338,14 @@ export class Platform extends BaseObject {
     }
   }
 }
+
+export class Lava extends BaseObject {
+  constructor(
+    x: number,
+    y: number,
+    ctx: CanvasRenderingContext2D,
+    gameState: GameState
+  ) {
+    super(x, y, ctx, gameState);
+  }
+}
