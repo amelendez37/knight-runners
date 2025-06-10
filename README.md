@@ -4,4 +4,4 @@
 2. yarn start
 
 ## todo
-1. 
+1. player resting on platform should move with it
