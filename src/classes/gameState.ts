@@ -171,7 +171,7 @@ export class GameState {
   }
 
   checkIsOutOfBounds(player: Player) {
-    return player.loc.y > this.getScreenHeight() || player.loc.x < 0;
+    return player.loc.y > this.getScreenHeight() || player.loc.x + player.hitbox.width * 2 < 0;
   }
 
   endGame() {
