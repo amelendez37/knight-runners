@@ -80,7 +80,7 @@ export class GameState {
     this.runCountdown().then((intervalId) => {
       clearInterval(intervalId as number);
       const timer = document.querySelector('.timer') as HTMLParagraphElement;
-      timer.innerHTML = '0';
+      timer.innerHTML = '3';
       this.paused = false;
       gameLoop();
     });
@@ -180,18 +180,18 @@ export class GameState {
   }
 
   showStartMenu() {
-    document.querySelector('.menu')?.classList.add('hide');
-  }
-
-  hideStartMenu() {
     document.querySelector('.menu')?.classList.remove('hide');
   }
 
+  hideStartMenu() {
+    document.querySelector('.menu')?.classList.add('hide');
+  }
+
   showGameOverMenu() {
-    document.querySelector('.gameOverMenu')?.classList.add('hide');
+    document.querySelector('.gameOverMenu')?.classList.remove('hide');
   }
 
   hideGameOverMenu() {
-    document.querySelector('.gameOverMenu')?.classList.remove('hide');
+    document.querySelector('.gameOverMenu')?.classList.add('hide');
   }
 }
