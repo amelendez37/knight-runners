@@ -107,6 +107,7 @@ export class BaseObject {
 
 export class Player extends BaseObject {
   jumpVelocity: number;
+  isAlive: boolean;
 
   JUMP_VELOCITY = 1.2;
 
@@ -128,6 +129,7 @@ export class Player extends BaseObject {
       yOffset: this.gameState.scaleY(PLAYER_HITBOX_Y_OFFSET),
     };
     this.jumpVelocity = this.gameState.scaleY(this.JUMP_VELOCITY);
+    this.isAlive = true;
 
     this.setupMovementControls();
   }
@@ -182,7 +184,7 @@ export class Player extends BaseObject {
   }
 
   updateLocation() {
-    if (this.gameState.paused) return;
+    if (this.gameState.paused || this.gameState.hasGameEnded) return;
 
     this.checkCollisions();
     // movement is updated based on time not renders so that
@@ -309,7 +311,7 @@ export class Platform extends BaseObject {
   }
 
   updateLocation() {
-    if (this.gameState.paused) return;
+    if (this.gameState.paused || this.gameState.hasGameEnded) return;
 
     const now = Date.now() / 1000; // current timestamp in seconds
     if (!this.lastRenderTimestamp) {

@@ -1,26 +1,87 @@
 import { Player, Platform } from './gameObjects';
+import { PLAYER_HEIGHT, COLLISION_OFFSET } from '../constants';
+import { getRandomFromArray } from '../utils';
 
 export class GameState {
-  #playerOjects: Player[] = [];
+  #playerObjects: Player[] = [];
   #platformOjects: Platform[] = [];
   screenBottomEdge: number;
   screenRightEdge: number;
+  ctx: CanvasRenderingContext2D;
 
   hasStarted = false;
   paused = true;
+  hasGameEnded = false;
 
-  constructor() {
+  constructor(ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx;
     // need to re assign this on window resize
     this.screenBottomEdge = window.innerHeight;
     this.screenRightEdge = window.innerWidth;
   }
 
-  startGame(gameState: GameState, gameLoop: Function) {
-    const menu = document.querySelector('.menu');
-    menu?.classList.add('hide');
+  initObjects() {
+    const STARTING_PLATFORM_LOC = {
+      x: 0,
+      y: this.getScreenHeight() / 2,
+    };
+
+    const player = new Player(
+      STARTING_PLATFORM_LOC.x,
+      STARTING_PLATFORM_LOC.y -
+      PLAYER_HEIGHT * this.getScreenHeight() +
+      COLLISION_OFFSET,
+      this.ctx,
+      this
+    );
+    this.addPlayerObject(player);
+
+    // initial platform players start on
+    const startingPlatform = new Platform(
+      STARTING_PLATFORM_LOC.x,
+      STARTING_PLATFORM_LOC.y,
+      this.getPlatformObjects().length,
+      this.ctx,
+      this,
+      Platform.WIDTH_MULTIPLIERS[Platform.WIDTH_MULTIPLIERS.length - 1],
+    );
+    this.addPlatformObject(startingPlatform);
+
+    // rest of platforms that spawn in the game. These platforms are reused throughout session for efficiency
+    for (let i = 0; i < 4; i++) {
+      const currPlatforms = this.getPlatformObjects();
+      const lastPlatform = currPlatforms[currPlatforms.length - 1];
+      const nextPlatformLoc = Platform.getNewPlatformLoc(lastPlatform, this);
+      const platform = new Platform(
+        nextPlatformLoc[0],
+        nextPlatformLoc[1],
+        this.getPlatformObjects().length,
+        this.ctx,
+        this,
+        getRandomFromArray(Platform.WIDTH_MULTIPLIERS),
+      );
+      this.addPlatformObject(platform);
+    }
+  }
+
+  startGame(gameLoop: Function) {
+    this.hideStartMenu();
+    this.runCountdownAndExecuteGameLoop(gameLoop);
+  }
+
+  restartGame(gameLoop: Function) {
+    this.clearGameState();
+    this.initObjects();
+    this.hideGameOverMenu();
+    this.runCountdownAndExecuteGameLoop(gameLoop);
+  }
+
+  runCountdownAndExecuteGameLoop(gameLoop: Function) {
     this.runCountdown().then((intervalId) => {
       clearInterval(intervalId as number);
-      gameState.paused = false;
+      const timer = document.querySelector('.timer') as HTMLParagraphElement;
+      timer.innerHTML = '0';
+      this.paused = false;
       gameLoop();
     });
   }
@@ -41,10 +102,6 @@ export class GameState {
         }
       }, 1000);
     });
-  }
-
-  getPlayerObjects() {
-    return this.#playerOjects;
   }
 
   getPlatformObjects() {
@@ -69,7 +126,11 @@ export class GameState {
   }
 
   addPlayerObject(playerObject: Player) {
-    this.#playerOjects.push(playerObject);
+    this.#playerObjects.push(playerObject);
+  }
+
+  getPlayerObjects() {
+    return this.#playerObjects;
   }
 
   setScreenDimensions(width: number, height: number) {
@@ -94,7 +155,43 @@ export class GameState {
   }
 
   clearGameState() {
-    this.#playerOjects = [];
+    this.#playerObjects = [];
     this.#platformOjects = [];
+    this.hasStarted = false;
+    this.paused = true;
+    this.hasGameEnded = false;
+  }
+
+  checkForDeadPlayers() {
+    for (const player of this.getPlayerObjects()) {
+      if (this.checkIsOutOfBounds(player)) {
+        this.endGame();
+      }
+    }
+  }
+
+  checkIsOutOfBounds(player: Player) {
+    return player.loc.y > this.getScreenHeight() || player.loc.x < 0;
+  }
+
+  endGame() {
+    this.hasGameEnded = true;
+    this.showGameOverMenu();
+  }
+
+  showStartMenu() {
+    document.querySelector('.menu')?.classList.add('hide');
+  }
+
+  hideStartMenu() {
+    document.querySelector('.menu')?.classList.remove('hide');
+  }
+
+  showGameOverMenu() {
+    document.querySelector('.gameOverMenu')?.classList.add('hide');
+  }
+
+  hideGameOverMenu() {
+    document.querySelector('.gameOverMenu')?.classList.remove('hide');
   }
 }
