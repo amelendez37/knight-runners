@@ -35,7 +35,8 @@ export class BaseObject {
   loc: Location;
   movingRight: boolean;
   movingLeft: boolean;
-  horizontalVelocity: number;
+  rightVelocity: number;
+  leftVelocity: number;
   verticalVelocity: number;
   gravity: number;
   sprite: Sprite;
@@ -47,7 +48,8 @@ export class BaseObject {
   lastRenderTimestamp = 0;
 
   // constants
-  HORIZONTAL_VELOCITY_DEFAULT = 0.15;
+  LEFT_VELOCITY_DEFAULT = 0;
+  RIGHT_VELOCITY_DEFAULT = 0;
   VERTICAL_VELOCITY_DEFAULT = 0;
   GRAVITY_DEFAULT = 0.42;
   SPEED_CONSTANT = 2; // for tweaking speed of all objects
@@ -61,8 +63,10 @@ export class BaseObject {
     this.loc = { x, y };
     this.movingRight = false;
     this.movingLeft = false;
-    this.horizontalVelocity =
-      gameState.getScreenWidth() * this.HORIZONTAL_VELOCITY_DEFAULT;
+    this.rightVelocity =
+      gameState.getScreenWidth() * this.RIGHT_VELOCITY_DEFAULT;
+    this.leftVelocity =
+      gameState.getScreenWidth() * this.LEFT_VELOCITY_DEFAULT;
     this.verticalVelocity =
       gameState.getScreenHeight() * this.VERTICAL_VELOCITY_DEFAULT;
     this.gravity = gameState.getScreenHeight() * this.GRAVITY_DEFAULT;
@@ -108,8 +112,11 @@ export class BaseObject {
 export class Player extends BaseObject {
   jumpVelocity: number;
   isAlive: boolean;
+  collidingPlatform: Platform | null;
 
   JUMP_VELOCITY = 1.2;
+  RIGHT_VELOCITY_DEFAULT = 0.17;
+  LEFT_VELOCITY_DEFAULT = .12;
 
   constructor(
     x: number,
@@ -130,6 +137,9 @@ export class Player extends BaseObject {
     };
     this.jumpVelocity = this.gameState.scaleY(this.JUMP_VELOCITY);
     this.isAlive = true;
+    this.collidingPlatform = null;
+    this.rightVelocity = 0;
+    this.leftVelocity = 0;
 
     this.setupMovementControls();
   }
@@ -151,11 +161,13 @@ export class Player extends BaseObject {
         this.getTopBound() <= platform.getBottomBound() + COLLISION_OFFSET &&
         this.getBottomBound() >= platform.getTopBound() + COLLISION_OFFSET;
       if (playerLeftSideCollision || playerRightSideCollision) {
-        this.horizontalVelocity = 0;
+        this.leftVelocity = 0;
+        this.rightVelocity = 0;
       } else {
-        this.horizontalVelocity = this.gameState.scaleX(
-          this.HORIZONTAL_VELOCITY_DEFAULT
+        this.leftVelocity = this.gameState.scaleX(
+          this.LEFT_VELOCITY_DEFAULT
         );
+        this.rightVelocity = this.gameState.scaleX(this.RIGHT_VELOCITY_DEFAULT);
       }
 
       const playerBottomCollision =
@@ -169,6 +181,7 @@ export class Player extends BaseObject {
         this.loc.y =
           platform.getTopBound() - (this.hitbox.height + this.hitbox.yOffset);
         this.hitbox.isOnGround = true;
+        this.collidingPlatform = platform;
         return;
       }
 
@@ -195,11 +208,20 @@ export class Player extends BaseObject {
     }
     const delta = now - this.lastRenderTimestamp;
     this.lastRenderTimestamp = now;
+
+    // apply movement from standing on platform
+    if (this.hitbox.isOnGround) {
+      const platform = this.collidingPlatform;
+      if (platform) {
+        this.loc.x -= platform.leftVelocity * platform.SPEED_CONSTANT * delta;
+      }
+    }
+
     // update horizontal movement
     if (this.movingRight) {
-      this.loc.x += this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+      this.loc.x += this.rightVelocity * this.SPEED_CONSTANT * delta;
     } else if (this.movingLeft) {
-      this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+      this.loc.x -= this.leftVelocity * this.SPEED_CONSTANT * delta;
     }
 
     // update vertical movement
@@ -252,6 +274,8 @@ export class Platform extends BaseObject {
   static PLATFORM_X_SPAWN_DISTANCE = 0.15;
   static WIDTH_MULTIPLIERS = [.5, 1, 1.25, 1.5, 2, 3];
 
+  LEFT_VELOCITY_DEFAULT = 0.8;
+
   constructor(
     x: number,
     y: number,
@@ -266,9 +290,9 @@ export class Platform extends BaseObject {
     // this.sprite.img.src = './assets/platform-min.png';
     this.sprite.height = this.gameState.scaleY(PLAYER_ASSET_HEIGHT);
     this.sprite.width = this.gameState.scaleX(PLAYER_ASSET_WIDTH);
-    this.HORIZONTAL_VELOCITY_DEFAULT = .14;
-    this.horizontalVelocity = this.gameState.scaleX(
-      this.HORIZONTAL_VELOCITY_DEFAULT
+    this.LEFT_VELOCITY_DEFAULT = .14;
+    this.leftVelocity = this.gameState.scaleX(
+      this.LEFT_VELOCITY_DEFAULT
     );
     this.movingLeft = true;
 
@@ -320,7 +344,9 @@ export class Platform extends BaseObject {
     const delta = now - this.lastRenderTimestamp;
     this.lastRenderTimestamp = now;
 
-    this.loc.x -= this.horizontalVelocity * this.SPEED_CONSTANT * delta;
+    if (this.movingLeft) {
+      this.loc.x -= this.leftVelocity * this.SPEED_CONSTANT * delta;
+    }
 
     if (this.loc.x < -this.hitbox.width) {
       const indexForRightMostPlatform =
