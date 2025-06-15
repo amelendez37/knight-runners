@@ -48,8 +48,8 @@ export class BaseObject {
   lastRenderTimestamp = 0;
 
   // constants
-  LEFT_VELOCITY_DEFAULT = 0.15;
-  RIGHT_VELOCITY_DEFAULT = 0.15;
+  LEFT_VELOCITY_DEFAULT = 0;
+  RIGHT_VELOCITY_DEFAULT = 0;
   VERTICAL_VELOCITY_DEFAULT = 0;
   GRAVITY_DEFAULT = 0.42;
   SPEED_CONSTANT = 2; // for tweaking speed of all objects
@@ -274,6 +274,8 @@ export class Platform extends BaseObject {
   static PLATFORM_X_SPAWN_DISTANCE = 0.15;
   static WIDTH_MULTIPLIERS = [.5, 1, 1.25, 1.5, 2, 3];
 
+  LEFT_VELOCITY_DEFAULT = 0.8;
+
   constructor(
     x: number,
     y: number,
@@ -342,7 +344,9 @@ export class Platform extends BaseObject {
     const delta = now - this.lastRenderTimestamp;
     this.lastRenderTimestamp = now;
 
-    this.loc.x -= this.leftVelocity * this.SPEED_CONSTANT * delta;
+    if (this.movingLeft) {
+      this.loc.x -= this.leftVelocity * this.SPEED_CONSTANT * delta;
+    }
 
     if (this.loc.x < -this.hitbox.width) {
       const indexForRightMostPlatform =
